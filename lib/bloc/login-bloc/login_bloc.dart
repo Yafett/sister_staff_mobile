@@ -15,7 +15,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      try {
+      try { 
         emit(LoginLoading());
         final result =
             await _authRepository.login(event.username, event.password);

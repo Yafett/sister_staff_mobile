@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:motion_toast/motion_toast.dart';
-import 'package:sister_staff_mobile/bloc/login_bloc.dart';
+import 'package:sister_staff_mobile/bloc/login-bloc/login_bloc.dart';
 import 'package:sister_staff_mobile/pages/employee/employee-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 

@@ -36,14 +36,21 @@ dependencies:
   dio: ^4.0.6
   dio_cookie_manager: ^2.0.0
   equatable: ^2.0.5
+  expandable: ^5.0.1
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.1
   google_fonts: ^3.0.1
   http: ^0.13.5
+  intl: ^0.17.0
   motion_toast: ^2.6.4
   shared_preferences: ^2.0.15
   shrink_sidemenu: ^2.0.0+2-null-safety
+  skeletons: ^0.0.3
+  slide_digital_clock: ^1.0.2
+  syncfusion_flutter_calendar: ^20.3.59
+  syncfusion_flutter_core: ^20.3.59
+  syncfusion_flutter_datepicker: ^20.3.59
 
 dev_dependencies:
   flutter_lints: ^2.0.0
