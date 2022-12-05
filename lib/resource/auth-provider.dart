@@ -14,7 +14,7 @@ class AuthProvider {
 
     var listUser = [];
 
-    var user = 'listyo_agung';
+    var user = 'cecilia';
     final pass = 'admin';
 
     final verify = await http.post(
@@ -59,6 +59,8 @@ class AuthProvider {
 
         user = code;
 
+        print(code);
+
         final getUser = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/User/${code}');
 
@@ -67,22 +69,23 @@ class AuthProvider {
         }
       }
 
-      if (listUser.contains('Instructor')) {  
-        print('rhodes');
+      // if (listUser.contains('Instructor')) {
+      //   print('rhodes');
 
-        final getInstructorCode = await dio
-            .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+      //   final getInstructorCode = await dio
+      //       .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
 
-        for (var a = 0; a < getInstructorCode.data['data'].length; a++) {
-          final getInstructor = await dio.get(
-              'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${getInstructorCode.data['data'][a]['name'].toString()}');
+      //   for (var a = 0; a < getInstructorCode.data['data'].length; a++) {
+      //     final getInstructor = await dio.get(
+      //         'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${getInstructorCode.data['data'][a]['name'].toString()}');
 
-          if (getInstructor.data['data']['instructor_email'].toString() ==
-              user) {
-            return 'Instructor';
-          }
-        }
-      } else if (listUser.contains('Employee')) {
+      //     if (getInstructor.data['data']['instructor_email'].toString() ==
+      //         user) {
+      //       return 'Instructor';
+      //     }
+      //   }
+      // } else
+      if (listUser.contains('Employee')) {
         print('lily');
         final getEmployeeCode = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/Employee/');

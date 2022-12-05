@@ -48,6 +48,7 @@ dependencies:
   shrink_sidemenu: ^2.0.0+2-null-safety
   skeletons: ^0.0.3
   slide_digital_clock: ^1.0.2
+  string_extensions: ^0.6.5
   syncfusion_flutter_calendar: ^20.3.59
   syncfusion_flutter_core: ^20.3.59
   syncfusion_flutter_datepicker: ^20.3.59

@@ -134,6 +134,9 @@ class _LoginPageState extends State<LoginPage> {
           if (role.toString() == 'Instructor') {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => EmployeePage()));
+          } else if (role.toString() == 'Employee') {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => EmployeePage()));
           }
         } else if (state is LoginError) {
           MotionToast(

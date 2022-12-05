@@ -1,7 +1,12 @@
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
+import 'package:string_extensions/string_extensions.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -14,13 +19,21 @@ class LeaveApplicationPage extends StatefulWidget {
 }
 
 class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
-  var leaveList = ['', ''];
-  var leaveStatus = ['Approved', 'Cancelled', 'Open'];
+  var leaveList = [];
+  var rawLeaveList = [];
+  var leaveStatus = ['All', 'Approved', 'Cancelled', 'Open'];
   int defaultChoiceIndex = 0;
 
   CalendarController _controller = CalendarController();
   String? _text = '', _titleText = '';
   Color? _headerColor, _viewHeaderColor, _calendarColor;
+
+  @override
+  void initState() {
+    _fetchLeaveData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return _pageScaffold();
@@ -89,7 +102,7 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                 selected: defaultChoiceIndex == index,
                 selectedColor: const Color(0xff2D333B),
                 onSelected: (value) {
-                  // _filterAttendance(_choicesList[index]);
+                  _filterAttendance(leaveStatus[index]);
                   if (mounted) {
                     setState(() {
                       defaultChoiceIndex = value ? index : defaultChoiceIndex;
@@ -113,17 +126,28 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
       child: Column(
         children: <Widget>[
           ...leaveList.map((item) {
-            return _buildLeaveCard();
+            return _buildLeaveCard(item['data']);
           }).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildLeaveCard() {
+  Widget _buildLeaveCard(leave) {
     final DateRangePickerController _controller = DateRangePickerController();
     String _date =
         DateFormat('dd, MMMM yyyy').format(DateTime.now()).toString();
+
+    var replacedFrom = leave['from_date'].toString().replaceAll('-', '');
+    String dateFromT = replacedFrom.substring(0, 8);
+    DateTime fromDateTime = DateTime.parse(dateFromT);
+
+    var replacedTo = leave['to_date'].toString().replaceAll('-', '');
+    String dateToT = replacedTo.substring(0, 8);
+    DateTime toDateTime = DateTime.parse(dateToT);
+
+    String formattedDate =
+        DateFormat('EEEE, dd MMMM yyyy').format(fromDateTime);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -150,12 +174,12 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                 header: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Wednesday, 20 January 2022',
+                    Text(formattedDate,
                         style: sWhiteTextStyle.copyWith(
                             fontSize: 20, fontWeight: semiBold)),
                     const SizedBox(height: 5),
                     Text(
-                      'Approved',
+                      leave['status'].toString(),
                       style: sGreenTextStyle.copyWith(
                           fontWeight: semiBold, fontSize: 14),
                     ),
@@ -178,9 +202,13 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                     Text('Reason',
                         style: sGreyTextStyle.copyWith(
                             fontSize: 14, fontWeight: semiBold)),
+                    const SizedBox(height: 5),
                     Container(
-                      margin: EdgeInsets.only(left: 10, bottom: 10),
-                      child: Text('Mau Healing',
+                      margin: EdgeInsets.only(left: 10, bottom: 15),
+                      child: Text(
+                          (leave['description'] == null)
+                              ? '-'
+                              : leave['description'].toString(),
                           style: sGreyTextStyle.copyWith(
                               fontSize: 16, fontWeight: semiBold)),
                     ),
@@ -189,9 +217,10 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                     Text('Type',
                         style: sGreyTextStyle.copyWith(
                             fontSize: 14, fontWeight: semiBold)),
+                    const SizedBox(height: 5),
                     Container(
-                      margin: EdgeInsets.only(left: 10, bottom: 10),
-                      child: Text('Cuti',
+                      margin: EdgeInsets.only(left: 10, bottom: 15),
+                      child: Text(leave['leave_type'].toString().capitalize!,
                           style: sGreyTextStyle.copyWith(
                               fontSize: 16, fontWeight: semiBold)),
                     ),
@@ -200,9 +229,10 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                     Text('Departement',
                         style: sGreyTextStyle.copyWith(
                             fontSize: 14, fontWeight: semiBold)),
+                    const SizedBox(height: 5),
                     Container(
-                      margin: EdgeInsets.only(left: 10, bottom: 10),
-                      child: Text('Research & Development',
+                      margin: EdgeInsets.only(left: 10, bottom: 15),
+                      child: Text(leave['department'],
                           style: sGreyTextStyle.copyWith(
                               fontSize: 16, fontWeight: semiBold)),
                     ),
@@ -211,9 +241,10 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                     Text('Leave Balance',
                         style: sGreyTextStyle.copyWith(
                             fontSize: 14, fontWeight: semiBold)),
+                    const SizedBox(height: 5),
                     Container(
-                      margin: EdgeInsets.only(left: 10, bottom: 10),
-                      child: Text('10',
+                      margin: EdgeInsets.only(left: 10, bottom: 15),
+                      child: Text(leave['leave_balance'].toString(),
                           style: sGreyTextStyle.copyWith(
                               fontSize: 16, fontWeight: semiBold)),
                     ),
@@ -222,7 +253,8 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                     Text('Duration - 21 Days',
                         style: sGreyTextStyle.copyWith(
                             fontSize: 14, fontWeight: semiBold)),
-                    _buildCalendar()
+                    const SizedBox(height: 5),
+                    _buildCalendar(fromDateTime, toDateTime)
                     // _buildCalendar(),
                   ],
                 ),
@@ -234,25 +266,39 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
     );
   }
 
-  Widget _buildCalendar() {
+  Widget _buildCalendar(date1, date2) {
+    print('date 1 : ${date1}');
+    print('date 2 : ${date2}');
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        color: sWhiteColor,
+        margin: EdgeInsets.only(top: 5),
+        // decoration: BoxDecoration(border: Border.all(color: sWhiteColor)),
         child: Card(
-          margin: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-          child: SfDateRangePicker( 
-            onSelectionChanged: (value) {
-              print(value.value.toString());
-            }, 
-            initialSelectedRange: PickerDateRange(DateTime(2022, 12, 5), DateTime(2022, 12, 7)),
-            selectionColor: sRedColor,
-            rangeSelectionColor: sRedColor,
-            initialDisplayDate: DateTime(2022, 12, 2),
-            // minDate: ,
-            todayHighlightColor: sRedColor,
-            startRangeSelectionColor: sRedColor,
-            view: DateRangePickerView.month,
-            selectionMode: DateRangePickerSelectionMode.extendableRange,
+          child: SfDateRangePickerTheme(
+            data: SfDateRangePickerThemeData(
+              todayTextStyle: sWhiteTextStyle.copyWith(color: sBlueColor),
+              todayHighlightColor: sWhiteColor,
+              selectionColor: sWhiteColor,
+              rangeSelectionColor: sRedColor,
+            ),
+            child: SfDateRangePicker(
+              // showNavigationArrow: true,
+              backgroundColor: Color.fromARGB(255, 204, 204, 204),
+              onSelectionChanged: (value) {
+                print(value.value.toString());
+              },
+              initialSelectedRange: PickerDateRange(date1, date2),
+              rangeSelectionColor: Color.fromARGB(153, 33, 149, 243),
+              todayHighlightColor: sGreenColor,
+              toggleDaySelection: false,
+              showTodayButton: false,
+              startRangeSelectionColor: Color.fromARGB(255, 33, 149, 243),
+              view: DateRangePickerView.month,
+              monthViewSettings: DateRangePickerMonthViewSettings(
+                enableSwipeSelection: false,
+              ),
+              selectionMode: DateRangePickerSelectionMode.extendableRange,
+            ),
           ),
         ));
   }
@@ -266,6 +312,83 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
     meetings.add(Meeting(
         'Conference', startTime, endTime, const Color(0xFF0F8644), false));
     return meetings;
+  }
+
+  int daysBetween(DateTime from, DateTime to) {
+    from = DateTime(from.year, from.month, from.day);
+    to = DateTime(to.year, to.month, to.day);
+    return (to.difference(from).inHours / 24).round();
+  }
+
+  _fetchLeaveData() async {
+    final dio = Dio();
+    var cookieJar = CookieJar();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var user = prefs.getString("username");
+    var pass = prefs.getString('password');
+
+    dio.interceptors.add(CookieManager(cookieJar));
+    final response = await dio
+        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+      'usr': user,
+      'pwd': pass,
+    });
+
+    final getCode = await dio.get(
+        'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/');
+
+    for (var a = 0; a < getCode.data['data'].length; a++) {
+      final code = getCode.data['data'][a]['name'].toString();
+      final getLeave = await dio.get(
+          'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/${code}');
+
+      if (mounted) {
+        setState(() {
+          leaveList.add(getLeave.data);
+          rawLeaveList.add(getLeave.data);
+        });
+      }
+    }
+  }
+
+  _filterAttendance(String filter) {
+    // isLoading = true;
+
+    if (mounted) {
+      setState(() {
+        leaveList.clear();
+        leaveList = rawLeaveList;
+      });
+    }
+
+    if (filter.toLowerCase() != 'all') {
+      for (var a = 0; a < leaveList.length; a++) {
+        var filteredList = leaveList
+            .where((element) =>
+                element['data']['status'].toString().toLowerCase() ==
+                filter.toLowerCase())
+            .toList();
+        if (mounted) {
+          setState(() {
+            leaveList = filteredList;
+          });
+        }
+      }
+    } else {
+      for (var a = 0; a < leaveList.length; a++) {
+        var filteredList = leaveList
+            .where((element) =>
+                element['data']['status'].toString().toLowerCase() !=
+                filter.toLowerCase())
+            .toList();
+        if (mounted) {
+          setState(() {
+            leaveList = filteredList;
+          });
+        }
+      }
+    }
   }
 }
 
