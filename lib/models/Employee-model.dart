@@ -1,14 +1,17 @@
 class Employee {
   Data? data;
   String? error;
-  Employee({this.data});
+
+  Employee({this.data, this.error});
 
   Employee.fromJson(Map<String, dynamic> json) {
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null; 
   }
+
   Employee.withError(String errorMessage) {
     error = errorMessage;
   }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.data != null) {
@@ -39,10 +42,14 @@ class Data {
   String? gender;
   String? dateOfBirth;
   String? dateOfJoining;
+  String? relation;
   String? userId;
   int? createUserPermission;
   int? noticeNumberOfDays;
   String? dateOfRetirement;
+  String? department;
+  String? reportsTo;
+  String? leaveApprover;
   String? salaryMode;
   String? preferedEmail;
   int? unsubscribed;
@@ -81,10 +88,14 @@ class Data {
     this.gender,
     this.dateOfBirth,
     this.dateOfJoining,
+    this.relation,
     this.userId,
     this.createUserPermission,
     this.noticeNumberOfDays,
     this.dateOfRetirement,
+    this.department,
+    this.reportsTo,
+    this.leaveApprover,
     this.salaryMode,
     this.preferedEmail,
     this.unsubscribed,
@@ -124,10 +135,14 @@ class Data {
     gender = json['gender'];
     dateOfBirth = json['date_of_birth'];
     dateOfJoining = json['date_of_joining'];
+    relation = json['relation'];
     userId = json['user_id'];
     createUserPermission = json['create_user_permission'];
     noticeNumberOfDays = json['notice_number_of_days'];
     dateOfRetirement = json['date_of_retirement'];
+    department = json['department'];
+    reportsTo = json['reports_to'];
+    leaveApprover = json['leave_approver'];
     salaryMode = json['salary_mode'];
     preferedEmail = json['prefered_email'];
     unsubscribed = json['unsubscribed'];
@@ -183,10 +198,14 @@ class Data {
     data['gender'] = this.gender;
     data['date_of_birth'] = this.dateOfBirth;
     data['date_of_joining'] = this.dateOfJoining;
+    data['relation'] = this.relation;
     data['user_id'] = this.userId;
     data['create_user_permission'] = this.createUserPermission;
     data['notice_number_of_days'] = this.noticeNumberOfDays;
     data['date_of_retirement'] = this.dateOfRetirement;
+    data['department'] = this.department;
+    data['reports_to'] = this.reportsTo;
+    data['leave_approver'] = this.leaveApprover;
     data['salary_mode'] = this.salaryMode;
     data['prefered_email'] = this.preferedEmail;
     data['unsubscribed'] = this.unsubscribed;

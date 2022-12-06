@@ -9,6 +9,7 @@ import 'package:shrink_sidemenu/shrink_sidemenu.dart';
 import 'package:sister_staff_mobile/bloc/leave-application/get_leave_application_bloc.dart';
 import 'package:sister_staff_mobile/bloc/profile-employee/get_profile_employee_bloc.dart';
 import 'package:sister_staff_mobile/models/Employee-model.dart';
+import 'package:sister_staff_mobile/pages/auth/profile-page.dart';
 import 'package:sister_staff_mobile/pages/auth/splash-page.dart';
 import 'package:sister_staff_mobile/pages/employee/leave-app/leave-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
@@ -200,7 +201,10 @@ class _EmployeePageState extends State<EmployeePage> {
 
   Widget _buildProfilePicture() {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ProfilePage()));
+      },
       child: Container(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -267,7 +271,10 @@ class _EmployeePageState extends State<EmployeePage> {
 
   Widget _buildProfileTitle(employee) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ProfilePage()));
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         margin: const EdgeInsets.only(bottom: 20),
@@ -414,7 +421,7 @@ class _EmployeePageState extends State<EmployeePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Schedule',
+              'Attendance',
               style: sWhiteTextStyle,
             ),
             const SizedBox(height: 5),
@@ -452,7 +459,7 @@ class _EmployeePageState extends State<EmployeePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'See your Schedule',
+                              'See your Attendance',
                               style: sWhiteTextStyle.copyWith(
                                   fontSize: 14, fontWeight: semiBold),
                             ),

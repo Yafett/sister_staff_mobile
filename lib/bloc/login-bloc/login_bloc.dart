@@ -15,7 +15,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      try { 
+      try {
         emit(LoginLoading());
         final result =
             await _authRepository.login(event.username, event.password);
@@ -23,6 +23,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         if (result == 'Error') {
           emit(LoginError('Your Email or Password is incorrect!'));
         } else {
+          print('result : ' + result.toString());
           emit(LoginSuccess(result.toString()));
         }
       } on NetworkError {

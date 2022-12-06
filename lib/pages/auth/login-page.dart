@@ -130,6 +130,7 @@ class _LoginPageState extends State<LoginPage> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           final role = state.role.toString();
+          print(role.toString());
 
           if (role.toString() == 'Instructor') {
             Navigator.push(context,

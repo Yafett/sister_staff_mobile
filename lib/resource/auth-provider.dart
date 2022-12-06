@@ -59,8 +59,6 @@ class AuthProvider {
 
         user = code;
 
-        print(code);
-
         final getUser = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/User/${code}');
 
@@ -69,55 +67,56 @@ class AuthProvider {
         }
       }
 
-      // if (listUser.contains('Instructor')) {
-      //   print('rhodes');
+      print(listUser.toString());
 
-      //   final getInstructorCode = await dio
-      //       .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+      if (listUser.contains('Instructor')) {
+        print('doctor');
 
-      //   for (var a = 0; a < getInstructorCode.data['data'].length; a++) {
-      //     final getInstructor = await dio.get(
-      //         'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${getInstructorCode.data['data'][a]['name'].toString()}');
+        final getInstructorCode = await dio
+            .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
 
-      //     if (getInstructor.data['data']['instructor_email'].toString() ==
-      //         user) {
-      //       return 'Instructor';
-      //     }
-      //   }
-      // } else
-      if (listUser.contains('Employee')) {
-        print('lily');
-        final getEmployeeCode = await dio
-            .get('https://njajal.sekolahmusik.co.id/api/resource/Employee/');
+        for (var a = 0; a < getInstructorCode.data['data'].length; a++) {
+          final getInstructor = await dio.get(
+              'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${getInstructorCode.data['data'][a]['name'].toString()}');
 
-        for (var a = 0; a < getEmployeeCode.data['data'].length; a++) {
-          final getEmployee = await dio.get(
-              'https://njajal.sekolahmusik.co.id/api/resource/Employee/${getEmployeeCode.data['data'][a]['name'].toString()}');
+          if (getInstructor.data['data']['instructor_email'].toString() ==
+              user) {
+            return 'Instructor';
+          } else if (listUser.contains('Employee')) {
+            print('kaltsit');
+            final getEmployeeCode = await dio.get(
+                'https://njajal.sekolahmusik.co.id/api/resource/Employee/');
 
-          if (getEmployee.data['data']['user_id'].toString() == user) {
-            return 'Employee';
-          }
-        }
-      } else if (listUser.contains('Student') ||
-          listUser.contains('Guardian')) {
-        print('surtr');
-        return 'User';
-      } else {
-        print('kroos');
-        final getUserCode = await dio
-            .get('https://njajal.sekolahmusik.co.id/api/resource/User/');
+            for (var a = 0; a < getEmployeeCode.data['data'].length; a++) {
+              final getEmployee = await dio.get(
+                  'https://njajal.sekolahmusik.co.id/api/resource/Employee/${getEmployeeCode.data['data'][a]['name'].toString()}');
 
-        for (var a = 0; a < getUserCode.data['data'].length; a++) {
-          final getUser = await dio.get(
-              'https://njajal.sekolahmusik.co.id/api/resource/User/${getUserCode.data['data'][a]['name'].toString()}');
+              if (getEmployee.data['data']['user_id'].toString() == user) {
+                return 'Employee';
+              }
+            }
+          } else if (listUser.contains('Student') ||
+              listUser.contains('Guardian')) {
+            print('kroos');
+            return 'User';
+          } else {
+            print('cp9');
+            final getUserCode = await dio
+                .get('https://njajal.sekolahmusik.co.id/api/resource/User/');
 
-          print(user.toString());
-          if (getUser.data['data']['user'].toString() == user) {
+            for (var a = 0; a < getUserCode.data['data'].length; a++) {
+              final getUser = await dio.get(
+                  'https://njajal.sekolahmusik.co.id/api/resource/User/${getUserCode.data['data'][a]['name'].toString()}');
+
+              print(user.toString());
+              if (getUser.data['data']['user'].toString() == user) {
+                return 'Customer';
+              }
+            }
+
             return 'Customer';
           }
         }
-
-        return 'Customer';
       }
     } else {
       return 'Error';

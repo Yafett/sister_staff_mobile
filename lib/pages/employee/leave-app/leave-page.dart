@@ -362,6 +362,8 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
       });
     }
 
+    
+
     if (filter.toLowerCase() != 'all') {
       for (var a = 0; a < leaveList.length; a++) {
         var filteredList = leaveList
