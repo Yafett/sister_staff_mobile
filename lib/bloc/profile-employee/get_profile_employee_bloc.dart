@@ -19,9 +19,14 @@ class GetProfileEmployeeBloc
       try {
         emit(GetProfileEmployeeLoading());
         final result = await _profileProvider.fetchProfileEmployee();
+        print(result.data!.company);
         emit(GetProfileEmployeeLoaded(result));
-      } catch (e) {
-        emit(GetProfileEmployeeError(e.toString()));
+        if (result.error != null) {
+          emit(GetProfileEmployeeError(result.error.toString()));
+        }
+      } on NetworkError {
+        emit(GetProfileEmployeeError(
+            "Failed to fetch data. is your device online?"));
       }
     });
   }

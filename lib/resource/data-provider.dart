@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sister_staff_mobile/models/Leave-model.dart';
+import 'package:sister_staff_mobile/models/Schedule-model.dart';
+import 'package:sister_staff_mobile/models/Student-Group-model.dart';
 
 class DataProvider {
   final dio = Dio();
@@ -31,6 +33,69 @@ class DataProvider {
     } catch (error, stacktrace) {
       print('Exception Occured: $error stackTrace: $stacktrace');
       return Leave.withError('Data not found / Connection Issues');
+    }
+  }
+
+  Future<Schedule> fetchSchedule({code}) async {
+    // 0062-t1-000001
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var user = pref.getString("username");
+    var pass = pref.getString('password');
+    var listSchedule = [];
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day - 7);
+    final tommorow = DateTime(now.year, now.month + 1, now.day);
+
+    try {
+      dio.interceptors.add(CookieManager(cookieJar));
+      final response = await dio
+          .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        'usr': user,
+        'pwd': pass,
+      });
+
+      if (code == null) {
+        final getCode = await dio
+            .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+
+        final code = getCode.data['data'][0]['name'];
+
+        final getEmail = await dio.get(
+            'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${code}');
+
+        final request = await dio.post(
+            'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+            data: {
+              'instructor': getEmail.data['data']['instructor_email'],
+              'from_date': yesterday.toString(),
+              'to_date': tommorow.toString(),
+            });
+
+        return Schedule.fromJson(request.data);
+      } else {
+        final request = await dio.post(
+          'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+          data: {
+            'instructor': code,
+            'from_date': yesterday.toString(),
+            'to_date': tommorow.toString(),
+          },
+        );
+
+        if (request.statusCode == 200) {
+          pref.setString(
+              'schedule-length', request.data['message'].length.toString());
+
+          return Schedule.fromJson(request.data);
+        } else {
+          return Schedule.withError('Data not found / Connection Issues');
+        }
+      }
+    } catch (error, stacktrace) {
+      // ignore: avoid_print
+      print('Schedule Data Exception Occured: $error stackTrace: $stacktrace');
+
+      return Schedule.withError('Data not found / Connection Issues');
     }
   }
 }

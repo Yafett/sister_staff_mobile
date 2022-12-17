@@ -5,7 +5,11 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sister_staff_mobile/bloc/profile-employee/get_profile_employee_bloc.dart';
+import 'package:sister_staff_mobile/bloc/profile-instructor/get_profile_instructor_bloc.dart';
+import 'package:sister_staff_mobile/bloc/profile-user/get_profile_user_bloc.dart';
 import 'package:sister_staff_mobile/models/Employee-model.dart';
+import 'package:sister_staff_mobile/models/Instructor-model.dart';
+import 'package:sister_staff_mobile/models/User-model.dart';
 import 'package:sister_staff_mobile/pages/auth/splash-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 
@@ -17,7 +21,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final _userBloc = GetProfileUserBloc();
   final _employeeBloc = GetProfileEmployeeBloc();
+  final _instructorBloc = GetProfileInstructorBloc();
 
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -32,10 +38,18 @@ class _ProfilePageState extends State<ProfilePage> {
   final _employeeCompanyController = TextEditingController();
   final _employeeStatusController = TextEditingController();
 
+  // ! instructor
+  final _instructorNameController = TextEditingController();
+  final _instructorEmailController = TextEditingController();
+  final _instructorCompanyController = TextEditingController();
+  final _instructorCompanyAbbrController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    _userBloc.add(GetProfileUserList());
     _employeeBloc.add(GetProfileEmployeeList());
+    _instructorBloc.add(GetProfileInstructorList());
   }
 
   @override
@@ -61,6 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               _buildUserSection(),
               _buildEmployeeSection(),
+              _buildInstructorSection(),
             ],
           )),
         ),
@@ -70,16 +85,26 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // ! User
   Widget _buildUserSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildUserProfile(),
-          _buildUserPicture(),
-          _buildUserData(),
-        ],
-      ),
+    return BlocBuilder<GetProfileUserBloc, GetProfileUserState>(
+      bloc: _userBloc,
+      builder: (context, state) {
+        if (state is GetProfileUserLoaded) {
+          User user = state.userModel;
+          return Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildUserProfile(),
+                _buildUserPicture(),
+                _buildUserData(user.data),
+              ],
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 
@@ -124,21 +149,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildUserData() {
+  Widget _buildUserData(user) {
+    print(user.toString());
+    _setUserData(user);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 15),
 
-        // ! title
-        Text(
-          'Basic Information',
-          style: sWhiteTextStyle.copyWith(fontWeight: semiBold, fontSize: 20),
-        ),
-        const Divider(
-          thickness: 1,
-          color: Color(0xff272C33),
-        ),
+        // // ! title
+        // Text(
+        //   'Basic Information',
+        //   style: sWhiteTextStyle.copyWith(fontWeight: semiBold, fontSize: 20),
+        // ),
+        // const Divider(
+        //   thickness: 1,
+        //   color: Color(0xff272C33),
+        // ),
 
         // ! First Name Field
         Text('First Name', style: fTextColorStyle),
@@ -235,6 +262,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  _setUserData(user) {
+    _firstNameController.text = (user.firstName == null) ? '-' : user.firstName;
+    _lastNameController.text = (user.lastName == null) ? '-' : user.lastName;
+    _emailController.text = user.email;
+    _birthDateController.text = user.birthDate;
+  }
+
   // ! Employee
   Widget _buildEmployeeSection() {
     return BlocBuilder<GetProfileEmployeeBloc, GetProfileEmployeeState>(
@@ -251,7 +285,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   iconPadding: const EdgeInsets.all(0),
                 ),
                 header: Text(
-                  'Employee',
+                  employee.data!.firstName.toString(),
                   style: sWhiteTextStyle.copyWith(
                       fontWeight: semiBold, fontSize: 20),
                 ),
@@ -415,21 +449,158 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 15),
       ],
     );
-  
   }
 
-  _setEmployeeData(employee) async {
-    //     final _employeeNameController = TextEditingController();
-    // final _employeeCodeController = TextEditingController();
-    // final _employeeSalutationController = TextEditingController();
-    // final _employeeDepartmentController = TextEditingController();
-    // final _employeeCompanyController = TextEditingController();
-    // final _employeeStatusController = TextEditingController();
+  _setEmployeeData(employee) {
     _employeeNameController.text = employee.employeeName;
     _employeeCodeController.text = employee.employee;
     _employeeSalutationController.text = employee.salutation;
     _employeeDepartmentController.text = employee.department;
     _employeeCompanyController.text = employee.company;
     _employeeStatusController.text = employee.status;
+  }
+
+  // ! Instructor
+  Widget _buildInstructorSection() {
+    return BlocBuilder<GetProfileInstructorBloc, GetProfileInstructorState>(
+      bloc: _instructorBloc,
+      builder: (context, state) {
+        if (state is GetProfileInstructorLoaded) {
+          Instructor instructor = state.instructorModel;
+          return Container(
+            margin: const EdgeInsets.only(top: 20, bottom: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ExpandablePanel(
+              theme: ExpandableThemeData(
+                iconColor: sWhiteColor,
+                iconPadding: const EdgeInsets.all(0),
+              ),
+              header: Text(
+                'Instructor',
+                style: sWhiteTextStyle.copyWith(
+                    fontWeight: semiBold, fontSize: 20),
+              ),
+              collapsed: Container(),
+              expanded: Column(
+                children: [
+                  _buildInstructorData(instructor.data),
+                ],
+              ),
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
+    );
+  }
+
+  Widget _buildInstructorData(instructor) {
+    _setInstructorData(instructor);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 15),
+
+        // ! Instructor Name Field
+        Text('Instructor Name', style: fTextColorStyle),
+        const SizedBox(height: 5),
+        TextFormField(
+          style: sWhiteTextStyle,
+          controller: _instructorNameController,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: sBlackColor,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            hintText: 'e.x john doe',
+            hintStyle: fGreyTextStyle,
+          ),
+        ),
+        const SizedBox(height: 15),
+
+        // ! Instructor Email Field
+        Text('Instructor Email', style: fTextColorStyle),
+        const SizedBox(height: 5),
+        TextFormField(
+          style: sWhiteTextStyle,
+          controller: _instructorEmailController,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: sBlackColor,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            hintText: 'e.x john doe',
+            hintStyle: fGreyTextStyle,
+          ),
+        ),
+        const SizedBox(height: 15),
+
+        // ! Instructor Company Field
+        Text('Instructor Company', style: fTextColorStyle),
+        const SizedBox(height: 5),
+        TextFormField(
+          style: sWhiteTextStyle,
+          controller: _instructorCompanyController,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: sBlackColor,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            hintText: 'e.x john doe',
+            hintStyle: fGreyTextStyle,
+          ),
+        ),
+        const SizedBox(height: 15),
+
+        // ! Instructor Company Abbr Field
+        Text('Instructor Company Abbr', style: fTextColorStyle),
+        const SizedBox(height: 5),
+        TextFormField(
+          style: sWhiteTextStyle,
+          controller: _instructorCompanyAbbrController,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: sBlackColor,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0XFF444C56)),
+            ),
+            hintText: 'e.x john doe',
+            hintStyle: fGreyTextStyle,
+          ),
+        ),
+        const SizedBox(height: 15),
+      ],
+    );
+  }
+
+  _setInstructorData(instructor) {
+    _instructorEmailController.text = instructor.instructorEmail;
+    _instructorNameController.text = instructor.instructorName;
+    _instructorCompanyController.text = instructor.company;
+    _instructorCompanyAbbrController.text = instructor.companyAbbr;
   }
 }

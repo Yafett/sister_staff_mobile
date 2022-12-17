@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:sister_staff_mobile/bloc/login-bloc/login_bloc.dart';
 import 'package:sister_staff_mobile/pages/employee/employee-page.dart';
+import 'package:sister_staff_mobile/pages/instructor/instructor-app.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 
 class LoginPage extends StatefulWidget {
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
 
           if (role.toString() == 'Instructor') {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EmployeePage()));
+                MaterialPageRoute(builder: (context) => InstructorPage()));
           } else if (role.toString() == 'Employee') {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => EmployeePage()));
@@ -171,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: sWhiteTextStyle.copyWith(
                   fontWeight: semiBold,
                   fontSize: 20,
+                  color: Colors.white,
                 ),
               )),
             ),

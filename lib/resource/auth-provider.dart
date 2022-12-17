@@ -14,7 +14,7 @@ class AuthProvider {
 
     var listUser = [];
 
-    var user = 'cecilia';
+    var user = 'maria_hikarita';
     final pass = 'admin';
 
     final verify = await http.post(
@@ -45,6 +45,8 @@ class AuthProvider {
 
         final code = getCode.data['data'][0]['name'];
 
+        prefs.setString('user-email', user);
+
         final getUser = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/User/${code}');
 
@@ -58,6 +60,8 @@ class AuthProvider {
         final code = getCode.data['data'][0]['name'];
 
         user = code;
+
+        prefs.setString('user-email', user);
 
         final getUser = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/User/${code}');
