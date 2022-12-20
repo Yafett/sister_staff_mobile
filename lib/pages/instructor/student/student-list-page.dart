@@ -39,10 +39,7 @@ class _StudentListPageState extends State<StudentListPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xff0D1117),
         centerTitle: true,
-        actions: const [
-          // Icon(Icons.qr_code_scanner, size: 30, color: Color(0xffC9D1D9)),
-          // SizedBox(width: 20),
-        ],
+        actions: const [],
       ),
       body: ScrollConfiguration(
         behavior: NoScrollWaves(),

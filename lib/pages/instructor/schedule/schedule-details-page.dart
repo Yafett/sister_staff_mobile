@@ -256,7 +256,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> {
                       });
                     },
                   ),
-                )
+                ),
               ],
             ),
           ]),

@@ -9,11 +9,14 @@ import 'package:shrink_sidemenu/shrink_sidemenu.dart';
 import 'package:sister_staff_mobile/bloc/instructor-schedule/instructor_schedule_bloc.dart';
 import 'package:sister_staff_mobile/bloc/profile-employee/get_profile_employee_bloc.dart';
 import 'package:sister_staff_mobile/bloc/profile-instructor/get_profile_instructor_bloc.dart';
+import 'package:sister_staff_mobile/bloc/student-group/student_group_bloc.dart';
 import 'package:sister_staff_mobile/models/Instructor-model.dart';
 import 'package:sister_staff_mobile/models/Schedule-model.dart';
+import 'package:sister_staff_mobile/models/Student-Group-model.dart';
 import 'package:sister_staff_mobile/pages/auth/profile-page.dart';
 import 'package:sister_staff_mobile/pages/auth/splash-page.dart';
 import 'package:sister_staff_mobile/pages/instructor/schedule/schedule-page.dart';
+import 'package:sister_staff_mobile/pages/instructor/student-group/student-group-list.dart';
 import 'package:sister_staff_mobile/pages/instructor/student/student-list-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
@@ -33,13 +36,16 @@ class _InstructorPageState extends State<InstructorPage> {
   final _employeeBloc = GetProfileEmployeeBloc();
   final _instructorBloc = GetProfileInstructorBloc();
   final _scheduleBloc = InstructorScheduleBloc();
+  final _studentGroupBloc = StudentGroupBloc();
   var studentlength;
+  var sgrouplength;
 
   @override
   void initState() {
     _employeeBloc.add(GetProfileEmployeeList());
     _instructorBloc.add(GetProfileInstructorList());
     _scheduleBloc.add(GetScheduleList());
+    _studentGroupBloc.add(GetStudentGroupList());
 
     super.initState();
   }
@@ -387,7 +393,7 @@ class _InstructorPageState extends State<InstructorPage> {
                         // (schedule.message!.length == 0)
                         //     ?
                         Text("${studentlength} Students",
-                            style: sGreyTextStyle.copyWith(fontSize: 22)),
+                            style: sWhiteTextStyle.copyWith(fontSize: 22)),
                         // : Text('${_getDate(schedule)}',
                         //     style: sWhiteTextStyle.copyWith(
                         //         fontSize: 22, fontWeight: semiBold)),
@@ -519,79 +525,96 @@ class _InstructorPageState extends State<InstructorPage> {
   }
 
   Widget _buildStudentGroupSection() {
-    return Container(
-        margin: EdgeInsets.only(top: 15),
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Student Group',
-              style: sWhiteTextStyle,
-            ),
-            const SizedBox(height: 5),
-            Material(
-              color: sBlackColor,
-              borderRadius: BorderRadius.circular(8),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8),
-                splashColor: sGreyColor,
-                onTap: () {
-                  // if (schedule.message!.length != 0) {
-                  //   Navigator.pushNamed(context, '/student-schedule');
-                  // }
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xff30363D),
-                      ),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // (schedule.message!.length == 0)
-                        //     ?
-                        Text("No Student Group avaliable",
-                            style: sGreyTextStyle.copyWith(fontSize: 22)),
-                        // : Text('${_getDate(schedule)}',
-                        //     style: sWhiteTextStyle.copyWith(
-                        //         fontSize: 22, fontWeight: semiBold)),
-                        // (schedule.message!.length == 0)
-                        // ?
-                        const SizedBox(),
-                        // : Text(
-                        //     '${schedule.message![0].fromTime.toString()} - ${_setDatetimeSchedule(schedule.message![0].scheduleDate.toString())}',
-                        //     style: sGreyTextStyle.copyWith(
-                        //         fontSize: 14, fontWeight: semiBold)),
-                        const Divider(
-                          height: 20,
-                          thickness: 1,
-                          color: Color(0xff272C33),
+    return BlocConsumer<StudentGroupBloc, StudentGroupState>(
+        bloc: _studentGroupBloc,
+        listener: (context, state) {
+          if (state is StudentGroupLoaded) {
+            _setStudentGroupTotal();
+            print('loaded ');
+          }
+        },
+        builder: (context, state) {
+          if (state is StudentGroupLoaded) {
+            StudentGroup sgroup = state.sgroupModel;
+            _setStudentGroupTotal();
+
+            return Container(
+                margin: EdgeInsets.only(top: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Student',
+                      style: sWhiteTextStyle,
+                    ),
+                    const SizedBox(height: 5),
+                    Material(
+                      color: sBlackColor,
+                      borderRadius: BorderRadius.circular(8),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        splashColor: sGreyColor,
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color(0xff30363D),
+                              ),
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('participate on',
+                                    style: sWhiteTextStyle.copyWith(
+                                        fontSize: 16, fontWeight: semiBold)),
+                                // (schedule.message!.length == 0)
+                                //     ?
+                                Text("${sgrouplength.toString()} Group",
+                                    style:
+                                        sWhiteTextStyle.copyWith(fontSize: 22)),
+                                // : Text('${_getDate(schedule)}',
+                                //     style: sWhiteTextStyle.copyWith(
+                                //         fontSize: 22, fontWeight: semiBold)),
+                                // (schedule.message!.length == 0)
+                                // ?
+                                const SizedBox(),
+                                // : Text(
+                                //     '${schedule.message![0].fromTime.toString()} - ${_setDatetimeSchedule(schedule.message![0].scheduleDate.toString())}',
+                                //     style: sGreyTextStyle.copyWith(
+                                //         fontSize: 14, fontWeight: semiBold)),
+                                const Divider(
+                                  height: 20,
+                                  thickness: 1,
+                                  color: Color(0xff272C33),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'See your Student List',
+                                      style: sWhiteTextStyle.copyWith(
+                                          fontSize: 14, fontWeight: semiBold),
+                                    ),
+                                    Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: sWhiteColor,
+                                      size: 20,
+                                    )
+                                  ],
+                                )
+                              ]),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'See your Student Group',
-                              style: sWhiteTextStyle.copyWith(
-                                  fontSize: 12, fontWeight: semiBold),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: sWhiteColor,
-                              size: 20,
-                            )
-                          ],
-                        )
-                      ]),
-                ),
-              ),
-            )
-          ],
-        ));
+                      ),
+                    )
+                  ],
+                ));
+          } else {
+            return Container();
+          }
+        });
   }
 
   Widget _buildLessonPlan() {
@@ -698,6 +721,17 @@ class _InstructorPageState extends State<InstructorPage> {
     }
 
     return listDate.last.toString();
+  }
+
+  _setStudentGroupTotal() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    if (mounted) {
+      setState(() {
+        sgrouplength = pref.getString('student-group-length');
+      });
+    }
+    print('length :' + sgrouplength.toString());
   }
 
   _setDatetimeSchedule(schedule) {

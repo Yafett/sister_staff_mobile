@@ -98,6 +98,75 @@ class DataProvider {
       return Schedule.withError('Data not found / Connection Issues');
     }
   }
+
+  Future<StudentGroup> fetchStudentGroup({code}) async {
+    // 0062-t1-000001
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var user = pref.getString("username");
+    var pass = pref.getString('password');
+    var listGroup = [];
+
+    try {
+      dio.interceptors.add(CookieManager(cookieJar));
+      final response = await dio
+          .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        'usr': user,
+        'pwd': pass,
+      });
+
+      if (code == null) {
+        final getCode = await dio
+            .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+
+        final code = getCode.data['data'][0]['name'];
+
+        final getStudentGroupCode = await dio.get(
+          'https://njajal.sekolahmusik.co.id/api/resource/Student Group/',
+        );
+
+        print('adada : ' + getStudentGroupCode.data['data'].length.toString());
+
+        pref.setString('student-group-length',
+            getStudentGroupCode.data['data'].length.toString());
+
+        // print(getStudentGroupCode.data.toString());
+
+        dio.interceptors.add(CookieManager(cookieJar));
+        final response = await dio
+            .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+          'usr': 'administrator',
+          'pwd': 'admin',
+        });
+
+        final getStudentGroup = await dio.get(
+          'https://njajal.sekolahmusik.co.id/api/resource/Student Group/${getStudentGroupCode.data['data'][0]['name']}',
+        );
+
+        return StudentGroup.fromJson(getStudentGroup.data);
+      } else {
+        final request = await dio.post(
+          'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+          data: {
+            'instructor': code,
+          },
+        );
+
+        if (request.statusCode == 200) {
+          pref.setString(
+              'schedule-length', request.data['message'].length.toString());
+
+          return StudentGroup.fromJson(request.data);
+        } else {
+          return StudentGroup.withError('Data not found / Connection Issues');
+        }
+      }
+    } catch (error, stacktrace) {
+      // ignore: avoid_print
+      print('Schedule Data Exception Occured: $error stackTrace: $stacktrace');
+
+      return StudentGroup.withError('Data not found / Connection Issues');
+    }
+  }
 }
 
 class NetworkError extends Error {}

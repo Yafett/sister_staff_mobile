@@ -43,7 +43,7 @@ class ProfileProvider {
 
     var user = pref.getString('username');
     var pass = pref.getString('password');
-
+  
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
@@ -55,7 +55,7 @@ class ProfileProvider {
       final getCode = await dio
           .get('https://njajal.sekolahmusik.co.id/api/resource/Employee/');
 
-      final getEmployee = await dio.get(
+      final getEmployee = await dio.get(  
           'https://njajal.sekolahmusik.co.id/api/resource/Employee/${getCode.data['data'][0]['name']}');
 
       return Employee.fromJson(getEmployee.data);
