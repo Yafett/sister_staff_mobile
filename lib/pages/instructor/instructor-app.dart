@@ -39,6 +39,7 @@ class _InstructorPageState extends State<InstructorPage> {
   final _studentGroupBloc = StudentGroupBloc();
   var studentlength;
   var sgrouplength;
+  var schedulelength;
 
   @override
   void initState() {
@@ -123,6 +124,7 @@ class _InstructorPageState extends State<InstructorPage> {
                           _buildScheduleSection(),
                           _buildStudentGroupSection(),
                           _buildLessonPlan(),
+                          const SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -320,29 +322,44 @@ class _InstructorPageState extends State<InstructorPage> {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          Container(
-            margin: const EdgeInsets.only(right: 10),
-            child: Chip(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: const BorderSide(color: Color(0xff30363D))),
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              backgroundColor: const Color(0xff272C33),
-              avatar: Icon(Icons.star, color: sWhiteColor, size: 15),
-              deleteIcon: Icon(
-                Icons.arrow_forward_ios,
-                size: 15,
-                color: sWhiteColor,
-              ),
-              label: Text(
-                'Test',
-                style: sWhiteTextStyle.copyWith(fontSize: 16),
-              ),
-              deleteButtonTooltipMessage: 'erase',
-              onDeleted: () {},
-            ),
+          GestureDetector(
+            child:
+                _buildChip('${studentlength.toString()} Student', Icons.person),
+          ),
+          GestureDetector(
+            child: _buildChip(
+                '${sgrouplength.toString()} Student Group', Icons.group),
+          ),
+          GestureDetector(
+            child: _buildChip(
+                '${schedulelength.toString()} Schedule', Icons.group),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildChip(String label, IconData icon) {
+    return Container(
+      margin: const EdgeInsets.only(right: 10),
+      child: Chip(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(color: Color(0xff30363D))),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        backgroundColor: const Color(0xff272C33),
+        avatar: Icon(icon, color: sWhiteColor, size: 15),
+        deleteIcon: Icon(
+          Icons.arrow_forward_ios,
+          size: 15,
+          color: sWhiteColor,
+        ),
+        label: Text(
+          label,
+          style: sWhiteTextStyle.copyWith(fontSize: 16),
+        ),
+        deleteButtonTooltipMessage: 'erase',
+        onDeleted: () {},
       ),
     );
   }
@@ -373,9 +390,6 @@ class _InstructorPageState extends State<InstructorPage> {
                           builder: (context) => StudentListPage(
                                 code: instructor.name.toString(),
                               )));
-                  // if (schedule.message!.length != 0) {
-                  //   Navigator.pushNamed(context, '/student-schedule');
-                  // }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -394,16 +408,10 @@ class _InstructorPageState extends State<InstructorPage> {
                         //     ?
                         Text("${studentlength} Students",
                             style: sWhiteTextStyle.copyWith(fontSize: 22)),
-                        // : Text('${_getDate(schedule)}',
-                        //     style: sWhiteTextStyle.copyWith(
-                        //         fontSize: 22, fontWeight: semiBold)),
-                        // (schedule.message!.length == 0)
+
                         // ?
                         const SizedBox(),
-                        // : Text(
-                        //     '${schedule.message![0].fromTime.toString()} - ${_setDatetimeSchedule(schedule.message![0].scheduleDate.toString())}',
-                        //     style: sGreyTextStyle.copyWith(
-                        //         fontSize: 14, fontWeight: semiBold)),
+
                         const Divider(
                           height: 20,
                           thickness: 1,
@@ -439,6 +447,7 @@ class _InstructorPageState extends State<InstructorPage> {
         if (state is InstructorScheduleLoaded) {
           Schedule schedule = state.scheduleModel;
           _setDate(schedule);
+          _setScheduleTotal();
           return Container(
               margin: EdgeInsets.only(top: 15),
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -701,6 +710,14 @@ class _InstructorPageState extends State<InstructorPage> {
     });
   }
 
+  _setScheduleTotal() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    setState(() {
+      schedulelength = pref.getString('schedule-length');
+    });
+  }
+
   _setDate(schedule) {
     var listDate = [];
 
@@ -731,7 +748,6 @@ class _InstructorPageState extends State<InstructorPage> {
         sgrouplength = pref.getString('student-group-length');
       });
     }
-    print('length :' + sgrouplength.toString());
   }
 
   _setDatetimeSchedule(schedule) {

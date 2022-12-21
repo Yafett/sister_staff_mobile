@@ -71,6 +71,9 @@ class DataProvider {
               'to_date': tommorow.toString(),
             });
 
+        pref.setString(
+            'schedule-length', request.data['message'].length.toString());
+
         return Schedule.fromJson(request.data);
       } else {
         final request = await dio.post(
