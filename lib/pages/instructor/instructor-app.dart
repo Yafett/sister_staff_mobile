@@ -15,6 +15,7 @@ import 'package:sister_staff_mobile/models/Schedule-model.dart';
 import 'package:sister_staff_mobile/models/Student-Group-model.dart';
 import 'package:sister_staff_mobile/pages/auth/profile-page.dart';
 import 'package:sister_staff_mobile/pages/auth/splash-page.dart';
+import 'package:sister_staff_mobile/pages/instructor-manager/instructor-list.dart';
 import 'package:sister_staff_mobile/pages/instructor/schedule/schedule-page.dart';
 import 'package:sister_staff_mobile/pages/instructor/student-group/student-group-list.dart';
 import 'package:sister_staff_mobile/pages/instructor/student/student-list-page.dart';
@@ -22,7 +23,8 @@ import 'package:sister_staff_mobile/shared/themes.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
 
 class InstructorPage extends StatefulWidget {
-  const InstructorPage({super.key});
+  bool? manager;
+  InstructorPage({super.key, this.manager});
 
   @override
   State<InstructorPage> createState() => _InstructorPageState();
@@ -69,7 +71,7 @@ class _InstructorPageState extends State<InstructorPage> {
             type: SideMenuType.slideNRotate,
             menu: Padding(
               padding: const EdgeInsets.only(left: 25.0),
-              child: _buildSidebar(),
+              child: _buildSidebar(instructor),
             ),
             maxMenuWidth: 250,
             onChange: (_isOpened) {
@@ -82,7 +84,7 @@ class _InstructorPageState extends State<InstructorPage> {
               radius: BorderRadius.circular(12),
               background: const Color.fromARGB(255, 41, 41, 41),
               key: _sideMenuKey,
-              menu: _buildSidebar(),
+              menu: _buildSidebar(instructor),
               type: SideMenuType.slideNRotate,
               onChange: (_isOpened) {
                 if (mounted) {
@@ -94,10 +96,14 @@ class _InstructorPageState extends State<InstructorPage> {
                 child: Scaffold(
                   backgroundColor: const Color(0xff0D1117),
                   appBar: AppBar(
+                    elevation: 0,
                     backgroundColor: const Color(0xff0D1117),
                     centerTitle: true,
                     leading: IconButton(
-                      icon: const Icon(Icons.menu),
+                      icon: const Icon(
+                        Icons.menu,
+                        size: 30,
+                      ),
                       onPressed: () => _setToggleMenu(),
                     ),
                     actions: const [
@@ -114,17 +120,14 @@ class _InstructorPageState extends State<InstructorPage> {
                         children: [
                           _buildProfilePicture(),
                           _buildProfileTitle(instructor.data),
-                          // ElevatedButton(
-                          //     onPressed: () async {
-                          //       _scheduleBloc.add(GetScheduleList());
-                          //     },
-                          //     child: Text('Testing button')),
                           _buildProfileChip(),
                           _buildStudentSection(instructor.data),
-                          _buildScheduleSection(),
+                          widget.manager == true
+                              ? _buildInstructorSection()
+                              : Container(),
                           _buildStudentGroupSection(),
-                          _buildLessonPlan(),
-                          const SizedBox(height: 30),
+                          _buildScheduleSection(),
+                          // const SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -140,7 +143,7 @@ class _InstructorPageState extends State<InstructorPage> {
     );
   }
 
-  Widget _buildSidebar() {
+  Widget _buildSidebar(instructor) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 50.0),
       child: Column(
@@ -160,7 +163,7 @@ class _InstructorPageState extends State<InstructorPage> {
                 ),
                 SizedBox(height: 16.0),
                 Text(
-                  'Hello,  ',
+                  'Hello, ${instructor.data.instructorName.toString()}',
                   style: TextStyle(color: Colors.white),
                 ),
                 SizedBox(height: 20.0),
@@ -168,7 +171,12 @@ class _InstructorPageState extends State<InstructorPage> {
             ),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfilePage(instructor: true)));
+            },
             leading: const Icon(Icons.person_outline,
                 size: 20.0, color: Colors.white),
             title: const Text("Profile"),
@@ -176,24 +184,32 @@ class _InstructorPageState extends State<InstructorPage> {
             dense: true,
           ),
           ListTile(
-            onTap: () {},
-            leading:
-                const Icon(Icons.date_range, size: 20.0, color: Colors.white),
-            title: const Text("Schedule"),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => StudentListPage(
+                            code: instructor.instructorEmail.toString(),
+                          )));
+            },
+            leading: const Icon(Icons.location_history_outlined,
+                size: 20.0, color: Colors.white),
+            title: const Text("Student"),
             textColor: Colors.white,
             dense: true,
-
-            // padding: EdgeInsets.zero,
           ),
           ListTile(
-            onTap: () {},
-            leading: const Icon(Icons.paragliding_outlined,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => StudentGroupListPage()));
+            },
+            leading: const Icon(Icons.group_outlined,
                 size: 20.0, color: Colors.white),
-            title: const Text("Leave"),
+            title: const Text("Student Group"),
             textColor: Colors.white,
             dense: true,
-
-            // padding: EdgeInsets.zero,
           ),
           ListTile(
             onTap: () async {
@@ -222,15 +238,23 @@ class _InstructorPageState extends State<InstructorPage> {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ProfilePage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfilePage(instructor: true)));
       },
       child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.only(bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfilePage(instructor: true)));
+                },
                 child: Container(
                   height: 80,
                   width: 80,
@@ -243,46 +267,47 @@ class _InstructorPageState extends State<InstructorPage> {
                       borderRadius: BorderRadius.circular(8)),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  DigitalClock(
-                    areaHeight: 0,
-                    areaDecoration: const BoxDecoration(
-                      color: const Color(0xff0D1117),
-                    ),
-                    hourMinuteDigitDecoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xff0D1117))),
-                    areaWidth: 0,
-                    digitAnimationStyle: Curves.elasticOut,
-                    showSecondsDigit: false,
-                    hourMinuteDigitTextStyle: const TextStyle(
-                      color: Color(0xff0D1117),
-                      fontSize: 0,
-                    ),
-                  ),
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.end,
+              //   mainAxisAlignment: MainAxisAlignment.end,
+              //   children: [
+              //     DigitalClock(
+              //       areaHeight: 0,
+              //       areaDecoration: const BoxDecoration(
+              //         color: const Color(0xff0D1117),
+              //       ),
+              //       minuteDigitDecoration: BoxDecoration(
+              //           border: Border.all(
+              //               color: Color.fromARGB(255, 254, 254, 255))),
+              //       areaWidth: 0,
+              //       digitAnimationStyle: Curves.elasticOut,
+              //       showSecondsDigit: false,
+              //       hourMinuteDigitTextStyle: const TextStyle(
+              //         color: Color(0xff0D1117),
+              //         fontSize: 0,
+              //       ),
+              //     ),
 
-                  // ! real clock
-                  Container(
-                    child: DigitalClock(
-                        areaDecoration: const BoxDecoration(
-                          color: const Color(0xff0D1117),
-                        ),
-                        areaWidth: 115,
-                        showSecondsDigit: false,
-                        hourMinuteDigitDecoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xff0D1117))),
-                        hourMinuteDigitTextStyle: sWhiteTextStyle.copyWith(
-                          fontSize: 40,
-                        )),
-                  ),
-                  Text(
-                    _setCurrentDate(),
-                    style: sWhiteTextStyle,
-                  ),
-                ],
-              ),
+              //     // ! real clock
+              //     Container(
+              //       child: DigitalClock(
+              //           areaDecoration: const BoxDecoration(
+              //             color: Color.fromARGB(255, 255, 255, 255),
+              //           ),
+              //           areaWidth: 100,
+              //           showSecondsDigit: false,
+              //           minuteDigitDecoration: BoxDecoration(
+              //               border: Border.all(color: const Color(0xff0D1117))),
+              //           hourMinuteDigitTextStyle: sBlackTextStyle.copyWith(
+              //             fontSize: 40,
+              //           )),
+              //     ),
+              //     Text(
+              //       _setCurrentDate(),
+              //       style: sWhiteTextStyle,
+              //     ),
+              //   ],
+              // ),
             ],
           )),
     );
@@ -292,7 +317,9 @@ class _InstructorPageState extends State<InstructorPage> {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ProfilePage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfilePage(instructor: true)));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -301,7 +328,7 @@ class _InstructorPageState extends State<InstructorPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Hello, ${instructor.instructorName.toString().toLowerCase()} !',
+              'Hello, ${instructor.instructorName.toString().toLowerCase()}!',
               style:
                   sWhiteTextStyle.copyWith(fontSize: 32, fontWeight: semiBold),
             ),
@@ -388,7 +415,7 @@ class _InstructorPageState extends State<InstructorPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => StudentListPage(
-                                code: instructor.name.toString(),
+                                code: instructor.instructorEmail.toString(),
                               )));
                 },
                 child: Container(
@@ -401,17 +428,12 @@ class _InstructorPageState extends State<InstructorPage> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('teach over',
+                        Text('Student total',
                             style: sWhiteTextStyle.copyWith(
                                 fontSize: 16, fontWeight: semiBold)),
-                        // (schedule.message!.length == 0)
-                        //     ?
                         Text("${studentlength} Students",
                             style: sWhiteTextStyle.copyWith(fontSize: 22)),
-
-                        // ?
                         const SizedBox(),
-
                         const Divider(
                           height: 20,
                           thickness: 1,
@@ -554,7 +576,7 @@ class _InstructorPageState extends State<InstructorPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Student',
+                      'Student Group',
                       style: sWhiteTextStyle,
                     ),
                     const SizedBox(height: 5),
@@ -564,7 +586,13 @@ class _InstructorPageState extends State<InstructorPage> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(8),
                         splashColor: sGreyColor,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      StudentGroupListPage()));
+                        },
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -575,24 +603,13 @@ class _InstructorPageState extends State<InstructorPage> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('participate on',
+                                Text('Participate on',
                                     style: sWhiteTextStyle.copyWith(
                                         fontSize: 16, fontWeight: semiBold)),
-                                // (schedule.message!.length == 0)
-                                //     ?
                                 Text("${sgrouplength.toString()} Group",
                                     style:
                                         sWhiteTextStyle.copyWith(fontSize: 22)),
-                                // : Text('${_getDate(schedule)}',
-                                //     style: sWhiteTextStyle.copyWith(
-                                //         fontSize: 22, fontWeight: semiBold)),
-                                // (schedule.message!.length == 0)
-                                // ?
                                 const SizedBox(),
-                                // : Text(
-                                //     '${schedule.message![0].fromTime.toString()} - ${_setDatetimeSchedule(schedule.message![0].scheduleDate.toString())}',
-                                //     style: sGreyTextStyle.copyWith(
-                                //         fontSize: 14, fontWeight: semiBold)),
                                 const Divider(
                                   height: 20,
                                   thickness: 1,
@@ -686,6 +703,74 @@ class _InstructorPageState extends State<InstructorPage> {
                               'See your Lesson List',
                               style: sWhiteTextStyle.copyWith(
                                   fontSize: 12, fontWeight: semiBold),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: sWhiteColor,
+                              size: 20,
+                            )
+                          ],
+                        )
+                      ]),
+                ),
+              ),
+            )
+          ],
+        ));
+  }
+
+  Widget _buildInstructorSection() {
+    return Container(
+        margin: EdgeInsets.only(top: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Instructor',
+              style: sWhiteTextStyle,
+            ),
+            const SizedBox(height: 5),
+            Material(
+              color: sBlackColor,
+              borderRadius: BorderRadius.circular(8),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                splashColor: sGreyColor,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => InstructorGroupPage()));  
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xff30363D),
+                      ),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Instructor total',
+                            style: sWhiteTextStyle.copyWith(
+                                fontSize: 16, fontWeight: semiBold)),
+                        Text("${studentlength} Instructor",
+                            style: sWhiteTextStyle.copyWith(fontSize: 22)),
+                        const SizedBox(),
+                        const Divider(
+                          height: 20,
+                          thickness: 1,
+                          color: Color(0xff272C33),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'See your Instructor List',
+                              style: sWhiteTextStyle.copyWith(
+                                  fontSize: 14, fontWeight: semiBold),
                             ),
                             Icon(
                               Icons.arrow_forward_ios,

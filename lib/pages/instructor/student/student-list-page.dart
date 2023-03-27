@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 import 'package:skeletons/skeletons.dart';
 
@@ -126,7 +127,7 @@ class _StudentListPageState extends State<StudentListPage> {
             onTap: () {},
             child: Container(
               width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(0),
               decoration: BoxDecoration(
                   border: Border.all(
                     color: const Color(0xff30363D),
@@ -136,47 +137,89 @@ class _StudentListPageState extends State<StudentListPage> {
                 children: [
                   (student['image'] != null)
                       ? Container(
-                          height: 60,
-                          width: 60,
+                          height: 85,
+                          width: 85,
                           decoration: BoxDecoration(
                               color: Colors.red,
                               image: DecorationImage(
                                 image: NetworkImage(image),
                                 fit: BoxFit.cover,
                               ),
-                              borderRadius: BorderRadius.circular(8)),
+                              borderRadius: BorderRadius.only()),
                         )
                       : Container(
-                          height: 60,
-                          width: 60,
-                          decoration: BoxDecoration(
+                          height: 85,
+                          width: 85,
+                          decoration: const BoxDecoration(
                               color: Colors.red,
-                              image: const DecorationImage(
+                              image: DecorationImage(
                                 image: AssetImage(
                                     'assets/images/staff-profile.jpg'),
                                 fit: BoxFit.fitHeight,
                               ),
-                              borderRadius: BorderRadius.circular(8)),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                bottomLeft: Radius.circular(8),
+                              )),
                         ),
-                  const SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width / 1.5,
-                        child: Text(student['student_name'].toString(),
+                  const SizedBox(width: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width / 1.7,
+                          child: Text(student['student_name'].toString(),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.left,
+                              softWrap: false,
+                              style: sWhiteTextStyle.copyWith(
+                                  fontSize: 16, fontWeight: semiBold)),
+                        ),
+                        Text(student['student'].toString(),
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            textAlign: TextAlign.left,
-                            softWrap: false,
-                            style: sWhiteTextStyle.copyWith(
-                                fontSize: 16, fontWeight: semiBold)),
-                      ),
-                      Text(student['student'].toString(),
-                          overflow: TextOverflow.ellipsis,
-                          style: sGreyTextStyle.copyWith(
-                              fontSize: 16, fontWeight: semiBold)),
-                    ],
+                            style: sGreyTextStyle.copyWith(
+                                fontSize: 14, fontWeight: semiBold)),
+                        SizedBox(height: 10),
+                        Row(children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 3, horizontal: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: _paymentStatusColor(
+                                  student['payment'].toString()),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(student['payment'].toString(),
+                                    style: sWhiteTextStyle)
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 3, horizontal: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: (student['status'].toString() == 'Active')
+                                  ? Color(0xff237D29)
+                                  : Color(0xff242A30),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(student['status'], style: sWhiteTextStyle)
+                              ],
+                            ),
+                          )
+                        ]),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -185,6 +228,20 @@ class _StudentListPageState extends State<StudentListPage> {
         )
       ]),
     );
+  }
+
+  _paymentStatusColor(payment) {
+    if (payment == 'Paid') {
+      return Color(0xff237D29);
+    } else if (payment == 'Unpaid') {
+      return Color(0xffF8814F);
+    } else if (payment == 'Cancelled' ||
+        payment == 'Overdue' ||
+        payment == 'Draft') {
+      return Color(0xffE24C4C);
+    } else {
+      return Colors.transparent;
+    }
   }
 
   _fetchStudent(code) async {
@@ -198,7 +255,7 @@ class _StudentListPageState extends State<StudentListPage> {
     final getCode = await dio.post(
         "https://njajal.sekolahmusik.co.id/api/method/smi.api.get_student_list",
         data: {
-          'ins': code,
+          'user': code,
         });
 
     if (getCode.statusCode == 200) {

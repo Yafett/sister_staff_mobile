@@ -11,6 +11,7 @@ import 'package:sister_staff_mobile/models/Schedule-model.dart';
 import 'package:sister_staff_mobile/pages/employee/leave-app/leave-page.dart';
 import 'package:sister_staff_mobile/pages/instructor/schedule/schedule-details-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
+import 'package:string_extensions/string_extensions.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 
@@ -82,7 +83,6 @@ class _SchedulePageState extends State<SchedulePage> {
         builder: (context, state) {
           if (state is InstructorScheduleLoaded) {
             Schedule schedule = state.scheduleModel;
-
             return SfCalendarTheme(
               data: SfCalendarThemeData(
                 todayTextStyle: sWhiteTextStyle,
@@ -170,6 +170,7 @@ class _SchedulePageState extends State<SchedulePage> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var user = pref.getString("username");
     var pass = pref.getString('password');
+    var email = pref.getString('instructor-email');
 
     final now = DateTime.now();
     final yesterday = DateTime(now.year, now.month, now.day - 7);
@@ -193,12 +194,10 @@ class _SchedulePageState extends State<SchedulePage> {
       final getEmail = await dio.get(
           'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${code}');
 
-      // print(getEmail.data['data']['instructor_email'].toString());
-
       final request = await dio.post(
           'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
           data: {
-            'instructor': 'mariahikarita@gmail.com',
+            'instructor': email,
             'from_date': yesterday.toString(),
             'to_date': tommorow.toString(),
           });
@@ -214,7 +213,7 @@ class _SchedulePageState extends State<SchedulePage> {
       final request = await dio.post(
           'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
           data: {
-            'instructor': 'mariahikarita@gmail.com',
+            'instructor': email,
             'from_date': yesterday.toString(),
             'to_date': tommorow.toString(),
           });
@@ -268,12 +267,6 @@ class _SchedulePageState extends State<SchedulePage> {
 
       var replace3 = replace2.replaceAll(' ', '');
 
-      // print('raw : ${time.toString() + ' ' + rawTime.length.toString()}');
-      // print(
-      //     'raw 2 : ${endTime.toString() + ' ' + rawEndTime.length.toString()}');
-      // print('raw 2 : ${rawDateToDateEnd.length.toString()}');
-
-      // ! final phase
       String date = replaced3;
       String dateWithT = date.substring(0, 8) + 'T' + date.substring(8);
       DateTime dateTime = DateTime.parse(dateWithT);
@@ -285,6 +278,11 @@ class _SchedulePageState extends State<SchedulePage> {
 
       end = dateTimeEnd;
 
+      String result =
+          element['company'].substring(0, element['company'].indexOf(' '));
+
+      print('aere ' + result.toString());
+
       meetings.add(Meeting(
           '${element['title']}',
           dateTime,
@@ -293,7 +291,7 @@ class _SchedulePageState extends State<SchedulePage> {
           sGreyColor,
           false,
           element['instructor_name'],
-          element['room'],
+          result + ' - ' + element['room'],
           element['schedule_date']));
     }
 

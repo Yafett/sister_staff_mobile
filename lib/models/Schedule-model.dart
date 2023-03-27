@@ -40,7 +40,7 @@ class Message {
   String? title;
   String? status;
   String? program;
-  Null? attendanceStatus;
+  String? attendanceStatus;
   String? company;
 
   Message(

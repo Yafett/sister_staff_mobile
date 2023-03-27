@@ -12,7 +12,6 @@ class ProfileProvider {
   final dio = Dio();
   var cookieJar = CookieJar();
 
-  // 最もプレイされたガチャゲーム
   Future<User> fetchProfile(codeDef) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var user = pref.getString("username");
@@ -32,7 +31,7 @@ class ProfileProvider {
           "https://njajal.sekolahmusik.co.id/api/resource/User/${emailUser}");
 
       return User.fromJson(request.data);
-    } catch (error, stacktrace) {
+    } catch (error) {
       // ignore: avoid_print
       return User.withError('Data not found / Connection Issues');
     }
@@ -79,8 +78,8 @@ class ProfileProvider {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
           .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
-        'usr': 'maria_hikarita',
-        'pwd': 'admin',
+        'usr': user,
+        'pwd': pass,
       });
 
       final getCode = await dio
@@ -89,10 +88,21 @@ class ProfileProvider {
       final getInstructor = await dio.get(
           'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${getCode.data['data'][0]['name']}');
 
+      print('fox : ' + getInstructor.data.toString());
+
+      pref.setString('instructor-email',
+          getInstructor.data['data']['instructor_email'].toString());
+
+      pref.setString(
+          'instructor-code', getInstructor.data['data']['name'].toString());
+
+      pref.setString('instructor-company',
+          getInstructor.data['data']['company'].toString());
+
       final getstudentLength = await dio.post(
           "https://njajal.sekolahmusik.co.id/api/method/smi.api.get_student_list",
           data: {
-            'ins': '${getCode.data['data'][0]['name']}',
+            'user': '${getInstructor.data['data']['instructor_email']}',
           });
 
       pref.setString(

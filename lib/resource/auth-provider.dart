@@ -14,7 +14,7 @@ class AuthProvider {
 
     var listUser = [];
 
-    var user = 'maria_hikarita';
+    var user = 'dana';
     final pass = 'admin';
 
     final verify = await http.post(
@@ -24,7 +24,7 @@ class AuthProvider {
           'pwd': pass,
         });
 
-    print(verify.body.toString());
+    print(verify.toString());
 
     if (verify.statusCode == 200) {
       dio.interceptors.add(CookieManager(cookieJar));
@@ -73,9 +73,20 @@ class AuthProvider {
 
       print(listUser.toString());
 
-      if (listUser.contains('Instructor')) {
-        print('doctor');
+      if (listUser.contains('Instructor Manager')) {
+        final getInstructorCode = await dio
+            .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
 
+        for (var a = 0; a < getInstructorCode.data['data'].length; a++) {
+          final getInstructor = await dio.get(
+              'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${getInstructorCode.data['data'][a]['name'].toString()}');
+
+          if (getInstructor.data['data']['instructor_email'].toString() ==
+              user) {
+            return 'Instructor Manager';
+          }
+        }
+      } else if (listUser.contains('Instructor')) {
         final getInstructorCode = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
 

@@ -53,11 +53,13 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const CircleAvatar(
-          radius: 50,
-          backgroundImage: AssetImage('assets/images/smi-logo-white.png'),
+        const SizedBox(height: 10),
+        Image(
+          fit: BoxFit.cover,
+          height: 70,
+          image: AssetImage('assets/images/title.png'),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         RichText(
           text: TextSpan(
             children: [
@@ -131,9 +133,15 @@ class _LoginPageState extends State<LoginPage> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           final role = state.role.toString();
-          print(role.toString());
 
-          if (role.toString() == 'Instructor') {
+          if (role.toString() == 'Instructor Manager') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => InstructorPage(
+                          manager: true,
+                        )));
+          } else if (role.toString() == 'Instructor') {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => InstructorPage()));
           } else if (role.toString() == 'Employee') {

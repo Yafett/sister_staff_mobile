@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sister_staff_mobile/models/Allocation-model.dart';
 import 'package:sister_staff_mobile/models/Leave-model.dart';
 import 'package:sister_staff_mobile/models/Schedule-model.dart';
 import 'package:sister_staff_mobile/models/Student-Group-model.dart';
@@ -20,12 +21,17 @@ class DataProvider {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
           .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
-        'usr': 'administrator',
-        'pwd': 'admin',
+        'usr': user,
+        'pwd': pass,
       });
 
       final getCode = await dio.get(
           'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/');
+
+      print('raveling : ' + getCode.data['data'].length.toString());
+
+      pref.setString('leave-length', getCode.data['data'].length.toString());
+
       final getLeave = await dio.get(
           'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/${getCode.data['data'][0]['name']}');
 
@@ -33,6 +39,38 @@ class DataProvider {
     } catch (error, stacktrace) {
       print('Exception Occured: $error stackTrace: $stacktrace');
       return Leave.withError('Data not found / Connection Issues');
+    }
+  }
+
+  Future<Allocation> fetchLeaveAllocation() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    var user = pref.getString('username');
+    var pass = pref.getString('password');
+
+    try {
+      dio.interceptors.add(CookieManager(cookieJar));
+      final response = await dio
+          .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+        'usr': user,
+        'pwd': pass,
+      });
+
+      final getCode = await dio.get(
+          'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/');
+
+      print('allocation : ' + getCode.data['data'].length.toString());
+
+      pref.setString(
+          'allocation-length', getCode.data['data'].length.toString());
+
+      final getAllocation = await dio.get(
+          'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/${getCode.data['data'][0]['name']}');
+
+      return Allocation.fromJson(getAllocation.data);
+    } catch (error, stacktrace) {
+      print('Exception Occured: $error stackTrace: $stacktrace');
+      return Allocation.withError('Data not found / Connection Issues');
     }
   }
 
@@ -132,14 +170,14 @@ class DataProvider {
         pref.setString('student-group-length',
             getStudentGroupCode.data['data'].length.toString());
 
-        // print(getStudentGroupCode.data.toString());
-
         dio.interceptors.add(CookieManager(cookieJar));
         final response = await dio
             .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
           'usr': 'administrator',
           'pwd': 'admin',
         });
+
+        print('limbo : ' + response.data.toString());
 
         final getStudentGroup = await dio.get(
           'https://njajal.sekolahmusik.co.id/api/resource/Student Group/${getStudentGroupCode.data['data'][0]['name']}',
@@ -170,6 +208,8 @@ class DataProvider {
       return StudentGroup.withError('Data not found / Connection Issues');
     }
   }
+
+ 
 }
 
 class NetworkError extends Error {}

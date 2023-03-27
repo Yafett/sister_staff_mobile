@@ -1,13 +1,14 @@
+// ignore_for_file: file_names
+
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../shared/themes.dart';
 import 'login-page.dart';
 
 class SplashPage extends StatefulWidget {
-  const SplashPage({super.key});
+  const SplashPage({Key? key}) : super(key: key);
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -15,22 +16,55 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   @override
-  Widget build(BuildContext context) {
-    return _pageScaffold();
+  void initState() {
+    super.initState();
   }
 
-  Widget _pageScaffold() {
+  @override
+  Widget build(BuildContext context) {
+    return _buildSplashPage(context);
+  }
+
+  Widget _buildSplashPage(context) {
     return Scaffold(
         body: AnimatedSplashScreen(
       splashIconSize: 1000,
-      duration: 1500,
-      splash: _buildSplashBackground(),
+      duration: 2000,
+      splash: _buildSecondSplashBackground(),
       nextScreen: const LoginPage(),
       splashTransition: SplashTransition.fadeTransition,
     ));
   }
 
-  Widget _buildSplashBackground() {
+  Widget _buildSecondSplashBackground() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+              fit: BoxFit.cover,
+              image: const AssetImage('assets/images/welcome.png')),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(''),
+            Container(
+                margin: EdgeInsets.only(bottom: 30),
+                child: Text(
+                  'Version 1.0.0',
+                  style: sGreyTextStyle.copyWith(
+                      fontWeight: FontWeight.bold, fontSize: 20),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSplashBackground(context) {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -42,7 +76,7 @@ class _SplashPageState extends State<SplashPage> {
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.2), BlendMode.dstATop),
-              image: const AssetImage('assets/images/splash-background.jpg')),
+              image: const AssetImage('assets/images/welcome.png')),
         ),
         child: _buildSplashText(),
       ),

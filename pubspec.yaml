@@ -34,7 +34,7 @@ dependencies:
   bloc: ^8.1.0
   cookie_jar: ^3.0.1
   cupertino_icons: ^1.0.2
-  dio: ^4.0.6
+  dio: ^5.0.1
   dio_cookie_manager: ^2.0.0
   dotted_border: ^2.0.0+3
   equatable: ^2.0.5
@@ -42,12 +42,13 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.1
+  flutter_rating_bar: ^4.0.1
   geocoding: ^2.0.5
-  google_fonts: ^3.0.1
+  google_fonts: ^4.0.3
   google_maps_flutter: ^2.2.2
   http: ^0.13.5
   intl: ^0.17.0
-  motion_toast: ^2.6.4
+  motion_toast: ^2.6.4 
   shared_preferences: ^2.0.15
   shrink_sidemenu: ^2.0.0+2-null-safety
   skeletons: ^0.0.3

@@ -14,7 +14,8 @@ import 'package:sister_staff_mobile/pages/auth/splash-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  var instructor = false;
+  ProfilePage({super.key, required this.instructor});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -49,7 +50,9 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _userBloc.add(GetProfileUserList());
     _employeeBloc.add(GetProfileEmployeeList());
-    _instructorBloc.add(GetProfileInstructorList());
+    if (widget.instructor == true) {
+      _instructorBloc.add(GetProfileInstructorList());
+    }
   }
 
   @override
@@ -95,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildUserProfile(),
+                _buildUserProfile(user.data),
                 _buildUserPicture(),
                 _buildUserData(user.data),
               ],
@@ -108,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildUserProfile() {
+  Widget _buildUserProfile(user) {
     return Row(
       children: [
         Container(
@@ -121,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         Text(
-          'Sena',
+          user.firstName.toString() + ' ' + user.lastName.toString(),
           style: sWhiteTextStyle.copyWith(
             fontWeight: semiBold,
             fontSize: 20,
@@ -150,7 +153,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildUserData(user) {
-    print(user.toString());
     _setUserData(user);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +278,6 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (context, state) {
           if (state is GetProfileEmployeeLoaded) {
             Employee employee = state.employeeModel;
-
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ExpandablePanel(
@@ -285,7 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   iconPadding: const EdgeInsets.all(0),
                 ),
                 header: Text(
-                  employee.data!.firstName.toString(),
+                  'Employee',
                   style: sWhiteTextStyle.copyWith(
                       fontWeight: semiBold, fontSize: 20),
                 ),
@@ -308,29 +309,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 15),
-
-        // ! Name Field
-        Text('Name', style: fTextColorStyle),
-        const SizedBox(height: 5),
-        TextFormField(
-          style: sWhiteTextStyle,
-          controller: _employeeNameController,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: sBlackColor,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0XFF444C56)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0XFF444C56)),
-            ),
-            hintText: 'e.x john doe',
-            hintStyle: fGreyTextStyle,
-          ),
-        ),
         const SizedBox(height: 15),
 
         // ! Employee Code Field
@@ -452,12 +430,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _setEmployeeData(employee) {
-    _employeeNameController.text = employee.employeeName;
-    _employeeCodeController.text = employee.employee;
-    _employeeSalutationController.text = employee.salutation;
-    _employeeDepartmentController.text = employee.department;
-    _employeeCompanyController.text = employee.company;
-    _employeeStatusController.text = employee.status;
+    _employeeNameController.text =
+        employee.employeeName == null ? '' : employee.employeeName;
+    _employeeCodeController.text =
+        employee.employee == null ? '' : employee.employee;
+    _employeeSalutationController.text =
+        employee.salutation == null ? '' : employee.salutation;
+    _employeeDepartmentController.text =
+        employee.department == null ? '' : employee.department;
+    _employeeCompanyController.text =
+        employee.company == null ? '' : employee.company;
+    _employeeStatusController.text =
+        employee.status == null ? '' : employee.status;
   }
 
   // ! Instructor
@@ -502,35 +486,12 @@ class _ProfilePageState extends State<ProfilePage> {
       children: [
         const SizedBox(height: 15),
 
-        // ! Instructor Name Field
-        Text('Instructor Name', style: fTextColorStyle),
+        // ! Name Field
+        Text('Name', style: fTextColorStyle),
         const SizedBox(height: 5),
         TextFormField(
           style: sWhiteTextStyle,
           controller: _instructorNameController,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: sBlackColor,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0XFF444C56)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0XFF444C56)),
-            ),
-            hintText: 'e.x john doe',
-            hintStyle: fGreyTextStyle,
-          ),
-        ),
-        const SizedBox(height: 15),
-
-        // ! Instructor Email Field
-        Text('Instructor Email', style: fTextColorStyle),
-        const SizedBox(height: 5),
-        TextFormField(
-          style: sWhiteTextStyle,
-          controller: _instructorEmailController,
           decoration: InputDecoration(
             filled: true,
             fillColor: sBlackColor,
@@ -598,9 +559,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _setInstructorData(instructor) {
-    _instructorEmailController.text = instructor.instructorEmail;
-    _instructorNameController.text = instructor.instructorName;
-    _instructorCompanyController.text = instructor.company;
-    _instructorCompanyAbbrController.text = instructor.companyAbbr;
+    print(instructor.name);
+    _instructorEmailController.text =
+        instructor.instructorEmail.toString() == 'null'
+            ? ''
+            : instructor.instructorEmail.toString();
+    _instructorNameController.text =
+        instructor.name.toString() == 'null' ? '' : instructor.name;
+    _instructorCompanyController.text =
+        instructor.company.toString() == 'null' ? '' : instructor.company;
+    _instructorCompanyAbbrController.text =
+        instructor.companyAbbr.toString() == 'null'
+            ? ''
+            : instructor.companyAbbr;
   }
 }

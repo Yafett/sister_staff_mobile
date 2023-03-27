@@ -3,8 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:motion_toast/motion_toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sister_staff_mobile/bloc/leave-allocation/get_leave_allocation_bloc.dart';
+import 'package:sister_staff_mobile/bloc/leave-application/get_leave_application_bloc.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 import 'package:string_extensions/string_extensions.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -21,8 +25,12 @@ class LeaveApplicationPage extends StatefulWidget {
 class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
   var leaveList = [];
   var rawLeaveList = [];
+  var allocationList = [];
   var leaveStatus = ['All', 'Approved', 'Cancelled', 'Open'];
   int defaultChoiceIndex = 0;
+
+  final _leaveBloc = GetLeaveApplicationBloc();
+  final _allocationBloc = GetLeaveAllocationBloc();
 
   CalendarController _controller = CalendarController();
   String? _text = '', _titleText = '';
@@ -30,7 +38,10 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
 
   @override
   void initState() {
+    _leaveBloc.add(GetLeaveApplicationList());
+    _allocationBloc.add(GetLeaveAllocationList());
     _fetchLeaveData();
+    _fetchAllocationData();
     super.initState();
   }
 
@@ -43,6 +54,7 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
     return Scaffold(
       backgroundColor: sBlackColor,
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: sBlackColor,
         leading: const BackButton(color: Color(0xffC9D1D9)),
         title: Text(
@@ -53,7 +65,19 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
           Container(
             margin: const EdgeInsets.only(right: 20),
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                MotionToast(
+                  height: 50,
+                  width: 300,
+                  primaryColor: sYellowColor,
+                  description: Text(
+                    'Not Ready Yet',
+                    style: sYellowTextStyle.copyWith(fontWeight: semiBold),
+                  ),
+                  icon: Icons.warning_amber,
+                  animationCurve: Curves.bounceIn,
+                ).show(context);
+              },
               child: Icon(
                 Icons.add_circle_outline_outlined,
                 color: sWhiteColor,
@@ -69,12 +93,78 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
           child: SizedBox(
               child: Column(
             children: [
+              _buildLeaveAllocation(),
               _buildFilterChip(),
               _buildLeaveList(),
             ],
           )),
         ),
       ),
+    );
+  }
+
+  Widget _buildLeaveAllocation() {
+    return BlocBuilder<GetLeaveAllocationBloc, GetLeaveAllocationState>(
+      bloc: _allocationBloc,
+      builder: (context, state) {
+        if (state is GetLeaveAllocationLoaded) {
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(0),
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ...allocationList.map((item) {
+                    return Container(
+                      margin: EdgeInsets.only(right: 5),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xff444C56)),
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 40,
+                            width: 40,
+                            child: Icon(
+                                _setAllocationIcon(item['data']['leave_type']),
+                                color: Colors.white,
+                                size: 30),
+                            decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(100))),
+                          ),
+                          SizedBox(width: 5),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${item['data']['total_leaves_allocated'].toInt().toString()} Days',
+                                style: sWhiteTextStyle.copyWith(fontSize: 16),
+                              ),
+                              Text(
+                                _setAllocationType(item['data']['leave_type']),
+                                style: sGreyTextStyle.copyWith(fontSize: 12),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 
@@ -121,15 +211,30 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
   }
 
   Widget _buildLeaveList() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: <Widget>[
-          ...leaveList.map((item) {
-            return _buildLeaveCard(item['data']);
-          }).toList(),
-        ],
-      ),
+    return BlocBuilder<GetLeaveApplicationBloc, GetLeaveApplicationState>(
+      bloc: _leaveBloc,
+      builder: (context, state) {
+        if (state is GetLeaveApplicationLoaded) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              children: <Widget>[
+                ...leaveList.map((item) {
+                  return _buildLeaveCard(item['data']);
+                }).toList(),
+              ],
+            ),
+          );
+        } else {
+          return Container(
+              height: MediaQuery.of(context).size.height / 1.5,
+              child: Center(
+                  child: Text(
+                "You didn't have any Leave",
+                style: sGreyTextStyle,
+              )));
+        }
+      },
     );
   }
 
@@ -232,7 +337,10 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                     const SizedBox(height: 5),
                     Container(
                       margin: EdgeInsets.only(left: 10, bottom: 15),
-                      child: Text(leave['department'],
+                      child: Text(
+                          (leave['departement'] == null)
+                              ? '-'
+                              : leave['departement'].toString(),
                           style: sGreyTextStyle.copyWith(
                               fontSize: 16, fontWeight: semiBold)),
                     ),
@@ -244,13 +352,14 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                     const SizedBox(height: 5),
                     Container(
                       margin: EdgeInsets.only(left: 10, bottom: 15),
-                      child: Text(leave['leave_balance'].toString(),
+                      child: Text(leave['leave_balance'].toInt().toString(),
                           style: sGreyTextStyle.copyWith(
                               fontSize: 16, fontWeight: semiBold)),
                     ),
 
                     // !  Duration
-                    Text('Duration - 21 Days',
+                    Text(
+                        'Duration - ${leave['total_leave_days'].toInt().toString()} Days',
                         style: sGreyTextStyle.copyWith(
                             fontSize: 14, fontWeight: semiBold)),
                     const SizedBox(height: 5),
@@ -267,8 +376,6 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
   }
 
   Widget _buildCalendar(date1, date2) {
-    print('date 1 : ${date1}');
-    print('date 2 : ${date2}');
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         margin: EdgeInsets.only(top: 5),
@@ -335,11 +442,14 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
       'pwd': pass,
     });
 
+    print(response.data.toString());
+
     final getCode = await dio.get(
         'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/');
 
     for (var a = 0; a < getCode.data['data'].length; a++) {
       final code = getCode.data['data'][a]['name'].toString();
+      print(code.toString());
       final getLeave = await dio.get(
           'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/${code}');
 
@@ -349,6 +459,8 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
           rawLeaveList.add(getLeave.data);
         });
       }
+
+      print('burned : ' + leaveList.toString());
     }
   }
 
@@ -361,8 +473,6 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
         leaveList = rawLeaveList;
       });
     }
-
-    
 
     if (filter.toLowerCase() != 'all') {
       for (var a = 0; a < leaveList.length; a++) {
@@ -390,6 +500,62 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
           });
         }
       }
+    }
+  }
+
+  _fetchAllocationData() async {
+    final dio = Dio();
+    final cookieJar = CookieJar();
+    final prefs = await SharedPreferences.getInstance();
+
+    var allocationCode = [];
+
+    var user = prefs.getString("username");
+    var pass = prefs.getString('password');
+
+    dio.interceptors.add(CookieManager(cookieJar));
+    final response = await dio
+        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+      'usr': user,
+      'pwd': pass,
+    });
+
+    final getCode = await dio.get(
+        'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/');
+
+    for (var a = 0; a < getCode.data['data'].length; a++) {
+      allocationCode.add(getCode.data['data'][a]['name']);
+    }
+
+    for (var b = 0; b < allocationCode.length; b++) {
+      final getData = await dio.get(
+          'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/${allocationCode[b]}');
+
+      if (mounted) {
+        setState(() {
+          allocationList.add(getData.data);
+        });
+      }
+    }
+  }
+
+  _setAllocationIcon(item) {
+    if (item.toString().toLowerCase() == 'sakit') {
+      return Icons.sick_outlined;
+    } else if (item.toString().toLowerCase() == 'day off') {
+      return Icons.holiday_village_outlined;
+    } else if (item.toString().toLowerCase() == 'cuti') {
+      return Icons.family_restroom_outlined;
+    }
+  }
+
+  _setAllocationType(item) {
+    if (item.toString().toLowerCase() == 'sakit') {
+      return 'Sick Leaves';
+    } else if (item.toString().toLowerCase() == 'day off') {
+      return 'Days Off';
+    } else if (item.toString().toLowerCase() == 'cuti') {
+      return 'Casual Leaves';
     }
   }
 }

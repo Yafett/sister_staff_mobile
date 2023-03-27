@@ -1,19 +1,28 @@
 // ignore_for_file: prefer_const_constructors, no_leading_underscores_for_local_identifiers
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motion_toast/motion_toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shrink_sidemenu/shrink_sidemenu.dart';
+import 'package:sister_staff_mobile/bloc/leave-allocation/get_leave_allocation_bloc.dart';
 import 'package:sister_staff_mobile/bloc/leave-application/get_leave_application_bloc.dart';
 import 'package:sister_staff_mobile/bloc/profile-employee/get_profile_employee_bloc.dart';
 import 'package:sister_staff_mobile/models/Employee-model.dart';
+import 'package:sister_staff_mobile/models/Leave-model.dart';
 import 'package:sister_staff_mobile/pages/auth/profile-page.dart';
 import 'package:sister_staff_mobile/pages/auth/splash-page.dart';
+import 'package:sister_staff_mobile/pages/employee/leave-app/leave-allocation-page.dart';
 import 'package:sister_staff_mobile/pages/employee/leave-app/leave-page.dart';
+import 'package:sister_staff_mobile/pages/instructor/schedule/schedule-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
+import 'package:string_extensions/string_extensions.dart';
 
 class EmployeePage extends StatefulWidget {
   const EmployeePage({super.key});
@@ -29,12 +38,18 @@ class _EmployeePageState extends State<EmployeePage> {
   final dio = Dio();
   final _employeeBloc = GetProfileEmployeeBloc();
   final _leaveBloc = GetLeaveApplicationBloc();
+  final _allocationBloc = GetLeaveAllocationBloc();
+
+  var leaveLength;
+  var allocationLength;
 
   @override
   void initState() {
     super.initState();
+    _getData();
     _employeeBloc.add(GetProfileEmployeeList());
     _leaveBloc.add(GetLeaveApplicationList());
+    _allocationBloc.add(GetLeaveAllocationList());
   }
 
   @override
@@ -55,7 +70,7 @@ class _EmployeePageState extends State<EmployeePage> {
             type: SideMenuType.slideNRotate,
             menu: Padding(
               padding: const EdgeInsets.only(left: 25.0),
-              child: _buildSidebar(),
+              child: _buildSidebar(employee),
             ),
             maxMenuWidth: 250,
             onChange: (_isOpened) {
@@ -68,7 +83,7 @@ class _EmployeePageState extends State<EmployeePage> {
               radius: BorderRadius.circular(12),
               background: const Color.fromARGB(255, 41, 41, 41),
               key: _sideMenuKey,
-              menu: _buildSidebar(),
+              menu: _buildSidebar(employee),
               type: SideMenuType.slideNRotate,
               onChange: (_isOpened) {
                 if (mounted) {
@@ -83,7 +98,7 @@ class _EmployeePageState extends State<EmployeePage> {
                     backgroundColor: const Color(0xff0D1117),
                     centerTitle: true,
                     leading: IconButton(
-                      icon: const Icon(Icons.menu),
+                      icon: const Icon(Icons.menu, size: 30),
                       onPressed: () => _setToggleMenu(),
                     ),
                     actions: const [
@@ -104,8 +119,10 @@ class _EmployeePageState extends State<EmployeePage> {
                           SizedBox(height: 10),
                           _buildAttendanceSection(),
                           SizedBox(height: 10),
+                          const SizedBox(height: 5),
                           _buildLeaveSection(),
                           SizedBox(height: 10),
+                          // _buildLeaveAllocationSection(),
                         ],
                       ),
                     ),
@@ -121,7 +138,7 @@ class _EmployeePageState extends State<EmployeePage> {
     );
   }
 
-  Widget _buildSidebar() {
+  Widget _buildSidebar(user) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 50.0),
       child: Column(
@@ -141,7 +158,7 @@ class _EmployeePageState extends State<EmployeePage> {
                 ),
                 SizedBox(height: 16.0),
                 Text(
-                  'Hello,  ',
+                  'Hello, ${user.data.firstName.toString().capitalize}',
                   style: TextStyle(color: Colors.white),
                 ),
                 SizedBox(height: 20.0),
@@ -152,44 +169,43 @@ class _EmployeePageState extends State<EmployeePage> {
             onTap: () {},
             leading: const Icon(Icons.person_outline,
                 size: 20.0, color: Colors.white),
-            title: const Text("Profile"),
+            title: const Text("Attendance"),
             textColor: Colors.white,
             dense: true,
           ),
           ListTile(
-            onTap: () {},
-            leading:
-                const Icon(Icons.date_range, size: 20.0, color: Colors.white),
-            title: const Text("Schedule"),
-            textColor: Colors.white,
-            dense: true,
-
-            // padding: EdgeInsets.zero,
-          ),
-          ListTile(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LeaveApplicationPage()));
+            },
             leading: const Icon(Icons.paragliding_outlined,
                 size: 20.0, color: Colors.white),
-            title: const Text("Leave"),
+            title: const Text("Leave Application"),
             textColor: Colors.white,
             dense: true,
-
-            // padding: EdgeInsets.zero,
           ),
           ListTile(
             onTap: () async {
               await dio
                   .get('https://sister.sekolahmusik.co.id/api/method/logout');
+
               // ignore: use_build_context_synchronously
+
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => SplashPage()),
                   (route) => false);
             },
+
             leading:
                 const Icon(Icons.exit_to_app, size: 20.0, color: Colors.white),
+
             title: const Text("Logout"),
+
             textColor: Colors.white,
+
             dense: true,
 
             // padding: EdgeInsets.zero,
@@ -203,10 +219,14 @@ class _EmployeePageState extends State<EmployeePage> {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ProfilePage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfilePage(
+                      instructor: false,
+                    )));
       },
       child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -224,46 +244,6 @@ class _EmployeePageState extends State<EmployeePage> {
                       borderRadius: BorderRadius.circular(8)),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  DigitalClock(
-                    areaHeight: 0,
-                    areaDecoration: const BoxDecoration(
-                      color: const Color(0xff0D1117),
-                    ),
-                    hourMinuteDigitDecoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xff0D1117))),
-                    areaWidth: 0,
-                    digitAnimationStyle: Curves.elasticOut,
-                    showSecondsDigit: false,
-                    hourMinuteDigitTextStyle: const TextStyle(
-                      color: Color(0xff0D1117),
-                      fontSize: 0,
-                    ),
-                  ),
-
-                  // ! real clock
-                  Container(
-                    child: DigitalClock(
-                        areaDecoration: const BoxDecoration(
-                          color: const Color(0xff0D1117),
-                        ),
-                        areaWidth: 115,
-                        showSecondsDigit: false,
-                        hourMinuteDigitDecoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xff0D1117))),
-                        hourMinuteDigitTextStyle: sWhiteTextStyle.copyWith(
-                          fontSize: 40,
-                        )),
-                  ),
-                  Text(
-                    _setCurrentDate(),
-                    style: sWhiteTextStyle,
-                  ),
-                ],
-              ),
             ],
           )),
     );
@@ -273,11 +253,13 @@ class _EmployeePageState extends State<EmployeePage> {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ProfilePage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfilePage(instructor: false)));
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        margin: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        // margin: const EdgeInsets.only(bottom: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -311,14 +293,15 @@ class _EmployeePageState extends State<EmployeePage> {
                   side: const BorderSide(color: Color(0xff30363D))),
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               backgroundColor: const Color(0xff272C33),
-              avatar: Icon(Icons.star, color: sWhiteColor, size: 15),
+              avatar: Icon(Icons.catching_pokemon_outlined,
+                  color: sWhiteColor, size: 15),
               deleteIcon: Icon(
                 Icons.arrow_forward_ios,
                 size: 15,
                 color: sWhiteColor,
               ),
               label: Text(
-                'Test',
+                '${leaveLength} Leave',
                 style: sWhiteTextStyle.copyWith(fontSize: 16),
               ),
               deleteButtonTooltipMessage: 'erase',
@@ -331,82 +314,229 @@ class _EmployeePageState extends State<EmployeePage> {
   }
 
   Widget _buildLeaveSection() {
-    return BlocBuilder<GetLeaveApplicationBloc, GetLeaveApplicationState>(
-      bloc: _leaveBloc,
-      builder: (context, state) {
-        if (state is GetLeaveApplicationLoaded) {
-          return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Leave',
-                    style: sWhiteTextStyle,
-                  ),
-                  const SizedBox(height: 5),
-                  Material(
-                    color: sBlackColor,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LeaveApplicationPage()));
-                      },
-                      splashColor: const Color(0xff30363D),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xff30363D),
-                            ),
-                            borderRadius: BorderRadius.circular(8)),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [],
-                              ),
-                              Text('Cuti',
-                                  style: sGreenTextStyle.copyWith(
-                                      fontSize: 16, fontWeight: semi)),
-                              Text('Wednesday, 20 January',
-                                  style: sWhiteTextStyle.copyWith(
-                                      fontSize: 20, fontWeight: semiBold)),
-                              Text('ke luar kota',
-                                  style: sGreyTextStyle.copyWith(
-                                      fontSize: 16, fontWeight: semiBold)),
-                              const Divider(
-                                height: 20,
-                                thickness: 1,
-                                color: Color(0xff272C33),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            'Leave',
+            style: sWhiteTextStyle,
+          ),
+        ),
+        BlocBuilder<GetLeaveApplicationBloc, GetLeaveApplicationState>(
+          bloc: _leaveBloc,
+          builder: (context, state) {
+            if (state is GetLeaveApplicationLoaded) {
+              Leave leave = state.leaveModel;
+
+              final DateFormat formatter = DateFormat('EEEE, dd MMMM yyyy');
+
+              var rawFrom = DateTime.parse(leave.data!.fromDate.toString());
+              final String fromDate = formatter.format(rawFrom);
+
+              return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Material(
+                        color: sBlackColor,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        LeaveApplicationPage()));
+                          },
+                          splashColor: const Color(0xff30363D),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xff30363D),
+                                ),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'See your Leave List',
-                                    style: sWhiteTextStyle.copyWith(
-                                        fontSize: 14, fontWeight: semiBold),
+                                      leave.data!.leaveType.capitalize
+                                          .toString(),
+                                      style: sGreenTextStyle.copyWith(
+                                          fontSize: 16, fontWeight: semi)),
+                                  Text(fromDate,
+                                      style: sWhiteTextStyle.copyWith(
+                                          fontSize: 20, fontWeight: semiBold)),
+                                  Text(
+                                      (leave.data!.description == null)
+                                          ? 'Without Description'
+                                          : leave.data!.description.toString(),
+                                      style: sGreyTextStyle.copyWith(
+                                          fontSize: 16, fontWeight: semiBold)),
+                                  const Divider(
+                                    height: 20,
+                                    thickness: 1,
+                                    color: Color(0xff272C33),
                                   ),
-                                  Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: sWhiteColor,
-                                    size: 20,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'See your Leave Application',
+                                        style: sWhiteTextStyle.copyWith(
+                                            fontSize: 14, fontWeight: semiBold),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: sWhiteColor,
+                                        size: 20,
+                                      )
+                                    ],
                                   )
-                                ],
-                              )
-                            ]),
+                                ]),
+                          ),
+                        ),
                       ),
+                    ],
+                  ));
+            } else {
+              return Container(
+                margin: EdgeInsets.only(top: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Material(
+                  color: sBlackColor,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    splashColor: sGreyColor,
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SchedulePage()));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color(0xff30363D),
+                          ),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("There's no Leave avaliable",
+                                style: sGreyTextStyle.copyWith(fontSize: 22)),
+                            SizedBox(),
+                            const Divider(
+                              height: 20,
+                              thickness: 1,
+                              color: Color(0xff272C33),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'See your Leave Application',
+                                  style: sWhiteTextStyle.copyWith(
+                                      fontSize: 14, fontWeight: semiBold),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: sWhiteColor,
+                                  size: 20,
+                                )
+                              ],
+                            )
+                          ]),
                     ),
-                  )
-                ],
-              ));
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLeaveAllocationSection() {
+    _getData();
+
+    return BlocConsumer<GetLeaveAllocationBloc, GetLeaveAllocationState>(
+      bloc: _allocationBloc,
+      listener: (context, state) async {
+        final pref = await SharedPreferences.getInstance();
+
+        if (mounted) {
+          setState(() {
+            allocationLength = pref.getString('allocation-length');
+          });
+        }
+      },
+      builder: (context, state) {
+        if (state is GetLeaveAllocationLoaded) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Material(
+              color: sBlackColor,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LeaveAllocationPage()));
+                },
+                splashColor: const Color(0xff30363D),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xff30363D),
+                      ),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [],
+                        ),
+                        Text('You have',
+                            style: sWhiteTextStyle.copyWith(fontSize: 16)),
+                        Text("${allocationLength.toString()} Leave Available",
+                            style: sGreenTextStyle.copyWith(
+                                fontSize: 22, fontWeight: semiBold)),
+                        const Divider(
+                          height: 20,
+                          thickness: 1,
+                          color: Color(0xff272C33),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'See your Leave Allocation',
+                              style: sWhiteTextStyle.copyWith(
+                                  fontSize: 14, fontWeight: semiBold),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: sWhiteColor,
+                              size: 20,
+                            )
+                          ],
+                        )
+                      ]),
+                ),
+              ),
+            ),
+          );
         } else {
           return Container();
         }
@@ -432,7 +562,17 @@ class _EmployeePageState extends State<EmployeePage> {
                 borderRadius: BorderRadius.circular(8),
                 splashColor: sGreyColor,
                 onTap: () {
-                  Navigator.pushNamed(context, '/student-schedule');
+                  MotionToast(
+                    height: 50,
+                    width: 300,
+                    primaryColor: sYellowColor,
+                    description: Text(
+                      'Not Ready Yet',
+                      style: sYellowTextStyle.copyWith(fontWeight: semiBold),
+                    ),
+                    icon: Icons.warning_amber,
+                    animationCurve: Curves.bounceIn,
+                  ).show(context);
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -508,5 +648,18 @@ class _EmployeePageState extends State<EmployeePage> {
     var formattedDate = DateFormat("EEE, d MMMM").format(DateTime.now());
 
     return formattedDate.toString();
+  }
+
+  _getData() async {
+    final pref = await SharedPreferences.getInstance();
+
+    if (mounted) {
+      setState(() {
+        allocationLength = pref.getString('allocation-length');
+        leaveLength = pref.getString('leave-length');
+      });
+    }
+
+    print('werewolf : ' + leaveLength.toString());
   }
 }

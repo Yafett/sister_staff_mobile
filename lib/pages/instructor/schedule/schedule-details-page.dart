@@ -217,7 +217,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> {
                   width: 10,
                 ),
                 Text(
-                  'Sekolah Musik Indonesia - ${widget.location}',
+                  '${widget.location}',
                   style: sGreyTextStyle.copyWith(
                       fontSize: 16, fontWeight: semiBold),
                 )

@@ -7,6 +7,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 import 'package:string_extensions/string_extensions.dart';
 
@@ -245,17 +246,21 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
   }
 
   _fetchStudentGroupList() async {
+    final pref = await SharedPreferences.getInstance();
     var listCode = [];
+    var user = pref.getString('username');
+    var pass = pref.getString('password');
+    var name = pref.getString('instructor-code');
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
         .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
-      'usr': 'maria_hikarita',
-      'pwd': 'admin',
+      'usr': user,
+      'pwd': pass,
     });
 
     final getCode = await dio.get(
-      "https://njajal.sekolahmusik.co.id/api/resource/Student Group/",
+      'https://njajal.sekolahmusik.co.id/api/resource/Student%20Group?fields=["name"]&filters=[["Student Group Instructor","instructor","=","${name}"]]',
     );
 
     for (var a = 0; a < getCode.data['data'].length; a++) {
@@ -266,11 +271,13 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
       }
     }
 
+    print('code : ' + listCode.toString());
+
     dio.interceptors.add(CookieManager(cookieJar));
     final adminLog = await dio
         .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
-      'usr': 'administrator',
-      'pwd': 'admin',
+      'usr': user,
+      'pwd': pass,
     });
 
     for (var a = 0; a < listCode.length; a++) {
@@ -282,11 +289,9 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
           listStudentGroup.add(getStudentDetail.data);
         });
       }
+
+      print(listStudentGroup.toString());
     }
-
-    print('list  : ' + listStudentGroup[0]['data']['students'].toString());
-
-    for (var a = 0; a < listStudentGroup[0]['data']['students'].length; a++) {}
   }
 
   _buildStatus(sgroup) {

@@ -18,6 +18,7 @@ Color sOrangeColor = const Color(0xffF8814F);
 TextStyle fWhiteTextStyle = GoogleFonts.openSans(color: Colors.white);
 TextStyle fBlackTextStyle = GoogleFonts.openSans(color: Colors.black);
 TextStyle fGreyTextStyle = GoogleFonts.openSans(color: Colors.grey);
+TextStyle sYellowTextStyle = GoogleFonts.openSans(color: Color(0xffE7A100));
 TextStyle fTextColorStyle =
     GoogleFonts.openSans(color: const Color(0xff8E8E8E));
 TextStyle fTermsColorStyle =

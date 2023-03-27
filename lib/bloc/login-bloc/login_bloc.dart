@@ -23,7 +23,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         if (result == 'Error') {
           emit(LoginError('Your Email or Password is incorrect!'));
         } else {
-          print('result : ' + result.toString());
           emit(LoginSuccess(result.toString()));
         }
       } on NetworkError {
