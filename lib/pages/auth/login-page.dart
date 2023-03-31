@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:sister_staff_mobile/bloc/login-bloc/login_bloc.dart';
+import 'package:sister_staff_mobile/pages/auth/profile-page.dart';
 import 'package:sister_staff_mobile/pages/employee/employee-page.dart';
+import 'package:sister_staff_mobile/pages/instructor-manager/instructor-manager-app.dart';
 import 'package:sister_staff_mobile/pages/instructor/instructor-app.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 
@@ -68,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: sBlackTextStyle.copyWith(
                       fontSize: 20, fontWeight: light)),
               TextSpan(
-                  text: 'Login ',
+                  text: 'Login',
                   style: sBlackTextStyle.copyWith(
                       fontSize: 30, fontWeight: semiBold)),
               TextSpan(
@@ -141,12 +143,22 @@ class _LoginPageState extends State<LoginPage> {
                     builder: (context) => InstructorPage(
                           manager: true,
                         )));
+          } else if (role.toString() == 'Instructor Manager Only') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => InstructorManagerPage()));
           } else if (role.toString() == 'Instructor') {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => InstructorPage()));
           } else if (role.toString() == 'Employee') {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => EmployeePage()));
+          } else if (role.toString() == 'Customer') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ProfilePage(instructor: false, employee: false,)));
           }
         } else if (state is LoginError) {
           MotionToast(

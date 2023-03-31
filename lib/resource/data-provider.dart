@@ -208,8 +208,6 @@ class DataProvider {
       return StudentGroup.withError('Data not found / Connection Issues');
     }
   }
-
- 
 }
 
 class NetworkError extends Error {}

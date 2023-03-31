@@ -19,6 +19,8 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
   final dio = Dio();
   final cookieJar = CookieJar();
 
+  bool isLoading = true;
+
   var listInstructor = [];
 
   var listInstructorTemporary = [];
@@ -57,16 +59,24 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
   }
 
   Widget _buildInstructorList() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: <Widget>[
-          ...listInstructorTemporary.map((item) {
-            return _buildInstructorCard(item);
-          }).toList(),
-        ],
-      ),
-    );
+    if (isLoading == true) {
+      return Container(
+          height: MediaQuery.of(context).size.height / 1.5,
+          child: Center(
+              child: Text('Loading your Student Data...',
+                  style: sWhiteTextStyle)));
+    } else {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          children: <Widget>[
+            ...listInstructorTemporary.map((item) {
+              return _buildInstructorCard(item);
+            }).toList(),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildInstructorCard(instructor) {
@@ -80,7 +90,8 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
             borderRadius: BorderRadius.circular(8),
             splashColor: sGreyColor,
             onTap: () {
-              _fetchStudentData(instructor['name']);
+              _fetchStudentData(
+                  instructor['name'], instructor['instructor_name']);
             },
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -249,12 +260,13 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
       if (mounted) {
         setState(() {
           listInstructor.add(getAttendance.data['message']);
+          isLoading = false;
         });
       }
     }
   }
 
-  _fetchStudentData(selectedTeacher) async {
+  _fetchStudentData(selectedTeacher, teacherName) async {
     var testList = listInstructor[0][selectedTeacher].values.toList();
 
     var foxList = [];
@@ -304,8 +316,11 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
         MaterialPageRoute(
             builder: (context) => InstructorManagerDetailPage(
                   instructor: selectedTeacher,
+                  instructorName: teacherName,
                   studentList: barrierList,
                   scheduleList: rockList,
+                  studentTotal: barrierList.length.toString(),
+                  scheduleTotal: rockList.length.toString(),
                 )));
   }
 }

@@ -15,7 +15,8 @@ import 'package:sister_staff_mobile/shared/themes.dart';
 
 class ProfilePage extends StatefulWidget {
   var instructor = false;
-  ProfilePage({super.key, required this.instructor});
+  var employee = false;
+  ProfilePage({super.key, required this.instructor, required this.employee});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -49,7 +50,9 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _userBloc.add(GetProfileUserList());
-    _employeeBloc.add(GetProfileEmployeeList());
+    if (widget.employee == true) {
+      _employeeBloc.add(GetProfileEmployeeList());
+    }
     if (widget.instructor == true) {
       _instructorBloc.add(GetProfileInstructorList());
     }
@@ -77,8 +80,8 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
             children: [
               _buildUserSection(),
-              _buildEmployeeSection(),
-              _buildInstructorSection(),
+              widget.employee == true ? _buildEmployeeSection() : Container(),
+              widget.instructor ? _buildInstructorSection() : Container(),
             ],
           )),
         ),
@@ -124,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         Text(
-          user.firstName.toString() + ' ' + user.lastName.toString(),
+          user.firstName.toString(),
           style: sWhiteTextStyle.copyWith(
             fontWeight: semiBold,
             fontSize: 20,
@@ -158,16 +161,6 @@ class _ProfilePageState extends State<ProfilePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 15),
-
-        // // ! title
-        // Text(
-        //   'Basic Information',
-        //   style: sWhiteTextStyle.copyWith(fontWeight: semiBold, fontSize: 20),
-        // ),
-        // const Divider(
-        //   thickness: 1,
-        //   color: Color(0xff272C33),
-        // ),
 
         // ! First Name Field
         Text('First Name', style: fTextColorStyle),
@@ -265,10 +258,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _setUserData(user) {
-    _firstNameController.text = (user.firstName == null) ? '-' : user.firstName;
-    _lastNameController.text = (user.lastName == null) ? '-' : user.lastName;
-    _emailController.text = user.email;
-    _birthDateController.text = user.birthDate;
+    _firstNameController.text = (user.firstName == null) ? '' : user.firstName;
+    _lastNameController.text = (user.lastName == null) ? '' : user.lastName;
+    _emailController.text = (user.email == null) ? '' : user.email;
+    _birthDateController.text = (user.birthDate == null) ? '' : user.birthDate;
   }
 
   // ! Employee

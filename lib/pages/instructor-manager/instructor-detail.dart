@@ -13,12 +13,18 @@ import 'package:sister_staff_mobile/shared/themes.dart';
 
 class InstructorManagerDetailPage extends StatefulWidget {
   String instructor;
+  String instructorName;
+  String studentTotal;
+  String scheduleTotal;
   var studentList = [];
   var scheduleList = [];
 
   InstructorManagerDetailPage(
       {super.key,
       required this.instructor,
+      required this.studentTotal,
+      required this.scheduleTotal,
+      required this.instructorName,
       required this.studentList,
       required this.scheduleList});
 
@@ -32,6 +38,8 @@ class _InstructorManagerDetailPageState
   var listRawStudent = [];
   var listStudent = [];
   var listSchedule = [];
+
+  ExpandableController expandableController = ExpandableController();
 
   @override
   void initState() {
@@ -94,7 +102,7 @@ class _InstructorManagerDetailPageState
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('GUNSLINGER',
+              Text(widget.instructorName,
                   style: sWhiteTextStyle.copyWith(
                       fontSize: 20, fontWeight: semiBold)),
               Text(
@@ -118,67 +126,51 @@ class _InstructorManagerDetailPageState
           color: Color(0xff30363D),
         ),
         width: MediaQuery.of(context).size.width,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Container(
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.person_2_outlined,
-                    color: sWhiteColor,
-                    size: 30,
-                  ),
-                  SizedBox(width: 5),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('12', style: sWhiteTextStyle.copyWith(fontSize: 16)),
-                      Text('Total Student', style: sGreyTextStyle),
-                    ],
-                  )
-                ],
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Container(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.person_2_outlined,
+                  color: sWhiteColor,
+                  size: 35,
+                ),
+                SizedBox(width: 5),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${widget.studentList.length.toString()}',
+                        style: sWhiteTextStyle.copyWith(fontSize: 16)),
+                    Text('Total Student', style: sGreyTextStyle),
+                  ],
+                )
+              ],
+            ),
+          ),
+          VerticalDivider(
+            thickness: 1,
+            width: 20,
+            color: sWhiteColor,
+          ),
+          Container(
+            child: Row(children: [
+              Icon(
+                Icons.exit_to_app,
+                color: sWhiteColor,
+                size: 35,
               ),
-            ),
-            SizedBox(width: 10),
-            Container(
-              child: Row(children: [
-                Icon(
-                  Icons.exit_to_app,
-                  color: sWhiteColor,
-                  size: 30,
-                ),
-                SizedBox(width: 5),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('123', style: sWhiteTextStyle.copyWith(fontSize: 16)),
-                    Text('Total Attendance', style: sGreyTextStyle),
-                  ],
-                )
-              ]),
-            ),
-            SizedBox(width: 10),
-            Container(
-              child: Row(children: [
-                Icon(
-                  Icons.content_paste_off_sharp,
-                  color: sWhiteColor,
-                  size: 30,
-                ),
-                SizedBox(width: 5),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('12', style: sWhiteTextStyle.copyWith(fontSize: 16)),
-                    Text('Total Absent', style: sGreyTextStyle),
-                  ],
-                )
-              ]),
-            ),
-          ]),
-        ),
+              SizedBox(width: 5),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${widget.scheduleList.length.toString()}',
+                      style: sWhiteTextStyle.copyWith(fontSize: 16)),
+                  Text('Total Attendance', style: sGreyTextStyle),
+                ],
+              )
+            ]),
+          ),
+        ]),
       ),
     );
   }
@@ -198,8 +190,13 @@ class _InstructorManagerDetailPageState
 
   Widget _buildStudentCard(item) {
     return ExpandablePanel(
+        // controller: expandableController,
         theme: ExpandableThemeData(
-            useInkWell: false, iconPadding: EdgeInsets.all(0), hasIcon: false),
+          iconColor: sWhiteColor,
+          useInkWell: false,
+          iconPadding: EdgeInsets.all(0),
+          hasIcon: false,
+        ),
         header: Container(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -217,35 +214,45 @@ class _InstructorManagerDetailPageState
                     ),
                     borderRadius: BorderRadius.circular(8)),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      height: 60,
-                      width: 60,
-                      decoration: const BoxDecoration(
-                          color: Colors.red,
-                          image: DecorationImage(
-                            image:
-                                AssetImage('assets/images/staff-profile.jpg'),
-                            fit: BoxFit.fitHeight,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(4))),
-                    ),
-                    SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(
-                          item['first_name'].toString(),
-                          style: sWhiteTextStyle.copyWith(
-                            fontSize: 18,
-                          ),
+                        Container(
+                          height: 60,
+                          width: 60,
+                          decoration: const BoxDecoration(
+                              color: Colors.red,
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    'assets/images/staff-profile.jpg'),
+                                fit: BoxFit.fitHeight,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4))),
                         ),
-                        Text(
-                          item['name'].toString(),
-                          style: sGreyTextStyle.copyWith(),
+                        SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item['first_name'].toString(),
+                              style: sWhiteTextStyle.copyWith(
+                                fontSize: 16,
+                                fontWeight: semiBold,
+                              ),
+                            ),
+                            Text(
+                              item['name'].toString(),
+                              style: sGreyTextStyle.copyWith(fontSize: 14),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                    ExpandableIcon(
+                      theme: ExpandableThemeData(iconColor: sWhiteColor),
+                    )
                   ],
                 ),
               ),
@@ -272,277 +279,299 @@ class _InstructorManagerDetailPageState
                           GestureDetector(
                             onTap: () {
                               showDialog(
-                                  anchorPoint: Offset(0, 0),
-                                  context: context,
-                                  builder: (_) => ConstrainedBox(
-                                        constraints:
-                                            BoxConstraints(maxWidth: 10000),
-                                        child: AlertDialog(
-                                          contentPadding: EdgeInsets.all(10),
-                                          backgroundColor: sBlackColor,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(8))),
-                                          content: Builder(
-                                            builder: (context) {
-                                              var height =
-                                                  MediaQuery.of(context)
-                                                      .size
-                                                      .height;
-                                              var width = MediaQuery.of(context)
-                                                  .size
-                                                  .width;
-
-                                              return Container(
-                                                height: height / 2.2,
-                                                width: 10000,
-                                                decoration: BoxDecoration(
-                                                  color: sBlackColor,
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    // ! Header
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: sBlackColor,
+                                    contentPadding: EdgeInsets.all(10),
+                                    content: Container(
+                                      width: double.maxFinite,
+                                      child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: sBlackColor,
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(height: 5),
+                                                  Row(
+                                                    children: [
+                                                      // ! docstatus Chip
+                                                      Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 3,
+                                                                horizontal: 10),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                            color: schedule['docstatus']
+                                                                        .toString() !=
+                                                                    '2'
+                                                                ? Color(
+                                                                    0xff384D4B)
+                                                                : Color(
+                                                                    0xff4D3838)),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Text(
-                                                              date.toString(),
-                                                              style:
-                                                                  sWhiteTextStyle
-                                                                      .copyWith(
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    semiBold,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '${schedule['from_time'].toString() != 'null' ? DateFormat.jm().format(DateFormat("hh:mm:ss").parse(schedule['from_time'].toString())).toString() : '-'} - ${schedule['to_time'].toString() != 'null' ? DateFormat.jm().format(DateFormat("hh:mm:ss").parse(schedule['to_time'].toString())).toString() : '-'}',
-                                                              style:
-                                                                  sGreyTextStyle
-                                                                      .copyWith(
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    semiBold,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5),
-                                                    Row(
-                                                      children: [
-                                                        // ! docstatus Chip
-                                                        Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 3,
-                                                                  horizontal:
-                                                                      10),
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          4),
-                                                              color: schedule['docstatus']
-                                                                          .toString() !=
-                                                                      '2'
-                                                                  ? Color(
-                                                                      0xff384D4B)
-                                                                  : Color(
-                                                                      0xff4D3838)),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Text(
-                                                                  _setDocstatusText(
+                                                                _setDocstatusText(
+                                                                    schedule[
+                                                                        'docstatus']),
+                                                                style:
+                                                                    sWhiteTextStyle
+                                                                        .copyWith(
+                                                                  fontSize: 14,
+                                                                  color: _setDocstatusColor(
                                                                       schedule[
                                                                           'docstatus']),
-                                                                  style: sWhiteTextStyle
-                                                                      .copyWith(
+                                                                ))
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 10),
+
+                                                      // ! status Chip
+                                                      Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 3,
+                                                                horizontal: 10),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4),
+                                                            color: schedule['status']
+                                                                        .toString() ==
+                                                                    'Present'
+                                                                ? Color(
+                                                                    0xff384D4B)
+                                                                : Color(
+                                                                    0xff4D3838)),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text(
+                                                                schedule[
+                                                                    'status'],
+                                                                style: sWhiteTextStyle.copyWith(
                                                                     fontSize:
-                                                                        16,
-                                                                    color: _setDocstatusColor(
-                                                                        schedule[
-                                                                            'docstatus']),
-                                                                  ))
-                                                            ],
-                                                          ),
+                                                                        14,
+                                                                    color: schedule['status'].toString() ==
+                                                                            'Present'
+                                                                        ? Color(
+                                                                            0xff70C5AF)
+                                                                        : Color(
+                                                                            0xffC57070)))
+                                                          ],
                                                         ),
-                                                        SizedBox(width: 10),
-
-                                                        // ! status Chip
-                                                        Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 3,
-                                                                  horizontal:
-                                                                      10),
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          4),
-                                                              color: schedule['status']
-                                                                          .toString() ==
-                                                                      'Present'
-                                                                  ? Color(
-                                                                      0xff384D4B)
-                                                                  : Color(
-                                                                      0xff4D3838)),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Text(
-                                                                  schedule[
-                                                                      'status'],
-                                                                  style: sWhiteTextStyle.copyWith(
-                                                                      fontSize:
-                                                                          16,
-                                                                      color: schedule['status'].toString() ==
-                                                                              'Present'
-                                                                          ? Color(
-                                                                              0xff70C5AF)
-                                                                          : Color(
-                                                                              0xffC57070)))
-                                                            ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Divider(
+                                                    color: sGreyColor,
+                                                    height: 20,
+                                                  ),
+                                                  // ! Header
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            date.toString(),
+                                                            style:
+                                                                sWhiteTextStyle
+                                                                    .copyWith(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  semiBold,
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-
-                                                    SizedBox(height: 20),
-                                                    // ! Header 2
-                                                    Text(
-                                                      schedule['name']
-                                                          .toString(),
-                                                      style: sWhiteTextStyle
-                                                          .copyWith(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  semiBold),
-                                                    ),
-                                                    Text(
-                                                      schedule['creation'],
-                                                      style: sGreyTextStyle
-                                                          .copyWith(
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-
-                                                    Divider(
-                                                      color: sGreyColor,
-                                                      height: 20,
-                                                    ),
-
-                                                    Text(
-                                                      'Comment :',
-                                                      style: sWhiteTextStyle
-                                                          .copyWith(
+                                                          Text(
+                                                            '${schedule['from_time'].toString() != 'null' ? DateFormat.jm().format(DateFormat("hh:mm:ss").parse(schedule['from_time'].toString())).toString() : '-'} - ${schedule['to_time'].toString() != 'null' ? DateFormat.jm().format(DateFormat("hh:mm:ss").parse(schedule['to_time'].toString())).toString() : '-'}',
+                                                            style:
+                                                                sGreyTextStyle
+                                                                    .copyWith(
                                                               fontSize: 16,
-                                                              fontWeight:
-                                                                  semiBold),
-                                                    ),
-                                                    Text(
-                                                      schedule['comment']
-                                                                  .toString() ==
-                                                              ''
-                                                          ? '-'
-                                                          : schedule['comment']
-                                                              .toString(),
-                                                      style: sGreyTextStyle
-                                                          .copyWith(
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Text(
-                                                      'Lesson :',
-                                                      style: sWhiteTextStyle
-                                                          .copyWith(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  semiBold),
-                                                    ),
-                                                    Text(
-                                                      schedule['lesson']
-                                                          .toString(),
-                                                      style: sGreyTextStyle
-                                                          .copyWith(
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Text(
-                                                      'Video URL :',
-                                                      style: sWhiteTextStyle
-                                                          .copyWith(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  semiBold),
-                                                    ),
-                                                    Text(
-                                                      schedule['video_url']
-                                                                  .toString() ==
-                                                              ''
-                                                          ? '-'
-                                                          : schedule[
-                                                                  'video_url']
-                                                              .toString(),
-                                                      style: sGreyTextStyle
-                                                          .copyWith(
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                      children: [
-                                                        RatingBar.builder(
-                                                          ignoreGestures: true,
-                                                          itemPadding:
-                                                              EdgeInsets.all(0),
-                                                          glowColor: sGreyColor,
-                                                          initialRating: schedule[
-                                                              'growth_point'],
-                                                          minRating: 1,
-                                                          direction:
-                                                              Axis.horizontal,
-                                                          allowHalfRating: true,
-                                                          itemCount: 5,
-                                                          itemBuilder:
-                                                              (context, _) =>
-                                                                  Icon(
-                                                            Icons.star,
-                                                            color: Color(
-                                                                0xff6B7178),
+                                                            ),
                                                           ),
-                                                          onRatingUpdate:
-                                                              (rating) {},
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 10),
+
+                                                  // ! Header 2
+                                                  Text(
+                                                    schedule['name'].toString(),
+                                                    style: sWhiteTextStyle
+                                                        .copyWith(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                semiBold),
+                                                  ),
+                                                  Text(
+                                                    schedule['creation'],
+                                                    style:
+                                                        sGreyTextStyle.copyWith(
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+
+                                                  Divider(
+                                                    color: sGreyColor,
+                                                    height: 20,
+                                                  ),
+
+                                                  Text(
+                                                    'Comment :',
+                                                    style: sWhiteTextStyle
+                                                        .copyWith(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                semiBold),
+                                                  ),
+                                                  Text(
+                                                    schedule['comment']
+                                                                .toString() ==
+                                                            ''
+                                                        ? '-'
+                                                        : schedule['comment']
+                                                            .toString(),
+                                                    style:
+                                                        sGreyTextStyle.copyWith(
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                    'Lesson :',
+                                                    style: sWhiteTextStyle
+                                                        .copyWith(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                semiBold),
+                                                  ),
+                                                  Text(
+                                                    schedule['lesson']
+                                                        .toString(),
+                                                    style:
+                                                        sGreyTextStyle.copyWith(
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                    'Video URL :',
+                                                    style: sWhiteTextStyle
+                                                        .copyWith(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                semiBold),
+                                                  ),
+                                                  Text(
+                                                    schedule['video_url']
+                                                                .toString() ==
+                                                            ''
+                                                        ? '-'
+                                                        : schedule['video_url']
+                                                            .toString(),
+                                                    style:
+                                                        sGreyTextStyle.copyWith(
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  Divider(
+                                                    color: sGreyColor,
+                                                    height: 20,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      RatingBar.builder(
+                                                        itemSize: 30,
+                                                        ignoreGestures: true,
+                                                        itemPadding:
+                                                            EdgeInsets.all(0),
+                                                        glowColor: sGreyColor,
+                                                        initialRating: schedule[
+                                                            'growth_point'],
+                                                        minRating: 1,
+                                                        direction:
+                                                            Axis.horizontal,
+                                                        allowHalfRating: true,
+                                                        itemCount: 5,
+                                                        itemBuilder:
+                                                            (context, _) =>
+                                                                Icon(
+                                                          Icons.star,
+                                                          color: Color.fromARGB(
+                                                              255,
+                                                              163,
+                                                              166,
+                                                              170),
                                                         ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ));
+                                                        onRatingUpdate:
+                                                            (rating) {},
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            )
+                                          ]),
+                                    ),
+                                  );
+                                },
+                              );
+                              // showDialog(
+                              //     context: context,
+                              //     useSafeArea: true,
+                              //     builder: (_) => ConstrainedBox(
+                              //           constraints:
+                              //               BoxConstraints(maxWidth: 1000000),
+                              //           child: AlertDialog(
+                              //             actionsPadding: EdgeInsets.all(0),
+                              //             contentPadding: EdgeInsets.all(10),
+                              //             backgroundColor: sBlackColor,
+                              //             shape: RoundedRectangleBorder(
+                              //                 borderRadius: BorderRadius.all(
+                              //                     Radius.circular(8))),
+                              //             content: Builder(
+                              //               builder: (context) {
+                              //                 var height =
+                              //                     MediaQuery.of(context)
+                              //                         .size
+                              //                         .height;
+                              //                 var width = MediaQuery.of(context)
+                              //                     .size
+                              //                     .width;
+
+                              //               },
+                              //             ),
+                              //           ),
+                              //         ));
                             },
                             child: Container(
                                 padding: EdgeInsets.all(10),
@@ -634,7 +663,6 @@ class _InstructorManagerDetailPageState
                                                     : '-',
                                                 style: sWhiteTextStyle.copyWith(
                                                   fontSize: 18,
-                                                  fontWeight: semiBold,
                                                 ),
                                               ),
                                             ],
@@ -666,7 +694,6 @@ class _InstructorManagerDetailPageState
                                                     : '-',
                                                 style: sWhiteTextStyle.copyWith(
                                                   fontSize: 18,
-                                                  fontWeight: semiBold,
                                                 ),
                                               ),
                                             ],

@@ -22,6 +22,8 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
   final dio = Dio();
   final cookieJar = CookieJar();
 
+  bool isLoading = true;
+
   var listStudentGroup = [];
 
   GoogleMapController? controller;
@@ -94,16 +96,24 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
   }
 
   Widget _buildStudentGroupList() {
-    return Container(
-      color: sBlackColor,
-      child: Column(
-        children: <Widget>[
-          ...listStudentGroup.map((item) {
-            return _buildStudentGroupCard(item);
-          }).toList(),
-        ],
-      ),
-    );
+    if (isLoading == true) {
+      return Container(
+          height: MediaQuery.of(context).size.height / 1.5,
+          child: Center(
+              child: Text('Loading your Student Group Data...',
+                  style: sWhiteTextStyle)));
+    } else {
+      return Container(
+        color: sBlackColor,
+        child: Column(
+          children: <Widget>[
+            ...listStudentGroup.map((item) {
+              return _buildStudentGroupCard(item);
+            }).toList(),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildStudentGroupCard(sgroup) {
@@ -292,18 +302,47 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
 
       print(listStudentGroup.toString());
     }
+
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   _buildStatus(sgroup) {
     if (sgroup['data']['docstatus'].toString() == '0') {
-      return Text(
-        'Draft',
-        style: sGreyTextStyle.copyWith(fontWeight: semiBold, fontSize: 14),
+      return Container(
+        width: 70,
+        padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4), color: Color(0xff242A30)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Draft',
+                style: sWhiteTextStyle.copyWith(
+                  fontSize: 14,
+                ))
+          ],
+        ),
       );
     } else {
-      return Text(
-        'Enabled',
-        style: sGreenTextStyle.copyWith(fontWeight: semiBold, fontSize: 14),
+      return Container(
+        width: 75,
+        padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4), color: Color(0xff384D4B)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Enabled',
+                style: sWhiteTextStyle.copyWith(
+                    fontSize: 14,
+                    color: Color(0xff70C5AF),
+                    fontWeight: semiBold))
+          ],
+        ),
       );
     }
   }

@@ -59,15 +59,15 @@ class _SchedulePageState extends State<SchedulePage> {
         title: Text('Your Schedule',
             style: sWhiteTextStyle.copyWith(fontWeight: semiBold)),
         actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, '/student-schedule-help');
-            },
-            child: Container(
-                margin: const EdgeInsets.only(right: 20),
-                child: const Icon(Icons.help_outline,
-                    size: 30, color: Color(0xffC9D1D9))),
-          )
+          // GestureDetector(
+          //   onTap: () {
+          //     Navigator.pushNamed(context, '/student-schedule-help');
+          //   },
+          //   child: Container(
+          //       margin: const EdgeInsets.only(right: 20),
+          //       child: const Icon(Icons.help_outline,
+          //           size: 30, color: Color(0xffC9D1D9))),
+          // )
         ],
       ),
       body: _buildCalendar(),
@@ -133,7 +133,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 height: MediaQuery.of(context).size.height,
                 child: Center(
                     child: Text(
-                  'Loading your Schedule...',
+                  'Loading your Schedule Data..',
                   style: sWhiteTextStyle,
                 )));
           } else {

@@ -1,5 +1,7 @@
 // ignore_for_file: unnecessary_brace_in_string_interps, unused_local_variable
 
+import 'dart:developer';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -14,17 +16,18 @@ class AuthProvider {
 
     var listUser = [];
 
-    var user = 'dana';
+    // var user = 'tjiptostevens';
+    // final pass = 'asd123';
+
+    var user = 'nuki';
     final pass = 'admin';
 
     final verify = await http.post(
         Uri.parse('https://njajal.sekolahmusik.co.id/api/method/login'),
         body: {
-          'usr': user,
-          'pwd': pass,
+          'usr': username,
+          'pwd': password,
         });
-
-    print(verify.toString());
 
     if (verify.statusCode == 200) {
       dio.interceptors.add(CookieManager(cookieJar));
@@ -83,10 +86,17 @@ class AuthProvider {
 
           if (getInstructor.data['data']['instructor_email'].toString() ==
               user) {
+            print('belle');
             return 'Instructor Manager';
+          } else {
+            print('Dave');
+            return 'Instructor Manager Only';
           }
         }
-      } else if (listUser.contains('Instructor')) {
+      }
+
+      if (listUser.contains('Instructor')) {
+        print('Estoc');
         final getInstructorCode = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
 
@@ -99,8 +109,9 @@ class AuthProvider {
             return 'Instructor';
           }
         }
-      } else if (listUser.contains('Employee')) {
-        print('kaltsit');
+      }
+      if (listUser.contains('Employee')) {
+        print('Gunmetalstorm');
         final getEmployeeCode = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/Employee/');
 
@@ -112,12 +123,15 @@ class AuthProvider {
             return 'Employee';
           }
         }
-      } else if (listUser.contains('Student') ||
-          listUser.contains('Guardian')) {
-        print('kroos');
+      }
+
+      if (listUser.contains('Student') || listUser.contains('Guardian')) {
+        print('Catoblepas');
+
         return 'User';
-      } else {
-        print('cp9');
+      }
+
+      if (listUser.contains('Employee') != true) {
         final getUserCode = await dio
             .get('https://njajal.sekolahmusik.co.id/api/resource/User/');
 
@@ -125,12 +139,12 @@ class AuthProvider {
           final getUser = await dio.get(
               'https://njajal.sekolahmusik.co.id/api/resource/User/${getUserCode.data['data'][a]['name'].toString()}');
 
-          print(user.toString());
-          if (getUser.data['data']['user'].toString() == user) {
+          if (getUser.data['data']['name'].toString() == user) {
+            print('Verethragna');
+
             return 'Customer';
           }
         }
-
         return 'Customer';
       }
     } else {

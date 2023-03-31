@@ -19,7 +19,7 @@ class _StudentListPageState extends State<StudentListPage> {
   final dio = Dio();
   final cookieJar = CookieJar();
 
-  bool isLoading = false;
+  bool isLoading = true;
 
   var listStudent = [];
 
@@ -63,36 +63,10 @@ class _StudentListPageState extends State<StudentListPage> {
   Widget _buildStudentList() {
     if (isLoading == true) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SkeletonAvatar(
-              style: SkeletonAvatarStyle(
-                shape: BoxShape.rectangle,
-                width: MediaQuery.of(context).size.width,
-                height: 80,
-              ),
-            ),
-            const SizedBox(height: 10),
-            SkeletonAvatar(
-              style: SkeletonAvatarStyle(
-                shape: BoxShape.rectangle,
-                width: MediaQuery.of(context).size.width,
-                height: 80,
-              ),
-            ),
-            const SizedBox(height: 10),
-            SkeletonAvatar(
-              style: SkeletonAvatarStyle(
-                shape: BoxShape.rectangle,
-                width: MediaQuery.of(context).size.width,
-                height: 80,
-              ),
-            ),
-          ],
-        ),
-      );
+          height: MediaQuery.of(context).size.height / 1.5,
+          child: Center(
+              child: Text('Loading your Student Data...',
+                  style: sWhiteTextStyle)));
     } else {
       return Container(
         color: sBlackColor,
@@ -115,7 +89,7 @@ class _StudentListPageState extends State<StudentListPage> {
       image = student['image'].toString();
     }
 
-    return SizedBox(
+    return Container(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: 10),
         Material(
@@ -164,7 +138,7 @@ class _StudentListPageState extends State<StudentListPage> {
                         ),
                   const SizedBox(width: 10),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 0),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -206,7 +180,7 @@ class _StudentListPageState extends State<StudentListPage> {
                                 vertical: 3, horizontal: 10),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
-                              color: (student['status'].toString() == 'Active')
+                              color: (student['status'].toString() == 'Active') 
                                   ? Color(0xff237D29)
                                   : Color(0xff242A30),
                             ),
@@ -264,10 +238,10 @@ class _StudentListPageState extends State<StudentListPage> {
         if (mounted) {
           setState(() {
             listStudent.add(student);
+            isLoading = false;
           });
         }
       }
-      print(listStudent.toString());
     }
   }
 }

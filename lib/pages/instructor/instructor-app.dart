@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_is_empty, prefer_const_constructors
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -42,6 +44,7 @@ class _InstructorPageState extends State<InstructorPage> {
   var studentlength;
   var sgrouplength;
   var schedulelength;
+  var instructorLength;
 
   @override
   void initState() {
@@ -49,7 +52,8 @@ class _InstructorPageState extends State<InstructorPage> {
     _instructorBloc.add(GetProfileInstructorList());
     _scheduleBloc.add(GetScheduleList());
     _studentGroupBloc.add(GetStudentGroupList());
-
+    _setInstructorTotal();
+    _setScheduleTotal();
     super.initState();
   }
 
@@ -163,7 +167,7 @@ class _InstructorPageState extends State<InstructorPage> {
                 ),
                 SizedBox(height: 16.0),
                 Text(
-                  'Hello, ${instructor.data.instructorName.toString()}',
+                  'Hello,s ${instructor.data.instructorName.toString()}',
                   style: TextStyle(color: Colors.white),
                 ),
                 SizedBox(height: 20.0),
@@ -175,7 +179,7 @@ class _InstructorPageState extends State<InstructorPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ProfilePage(instructor: true)));
+                      builder: (context) => ProfilePage(instructor: true, employee: true,)));
             },
             leading: const Icon(Icons.person_outline,
                 size: 20.0, color: Colors.white),
@@ -240,7 +244,7 @@ class _InstructorPageState extends State<InstructorPage> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfilePage(instructor: true)));
+                builder: (context) => ProfilePage(instructor: true, employee: true,)));
       },
       child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -253,7 +257,7 @@ class _InstructorPageState extends State<InstructorPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ProfilePage(instructor: true)));
+                          builder: (context) => ProfilePage(instructor: true, employee: true,)));
                 },
                 child: Container(
                   height: 80,
@@ -319,7 +323,7 @@ class _InstructorPageState extends State<InstructorPage> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfilePage(instructor: true)));
+                builder: (context) => ProfilePage(instructor: true, employee: true,)));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -352,6 +356,10 @@ class _InstructorPageState extends State<InstructorPage> {
           GestureDetector(
             child:
                 _buildChip('${studentlength.toString()} Student', Icons.person),
+          ),
+          GestureDetector(
+            child: _buildChip(
+                '${instructorLength.toString()} Instructor', Icons.school),
           ),
           GestureDetector(
             child: _buildChip(
@@ -468,10 +476,8 @@ class _InstructorPageState extends State<InstructorPage> {
       builder: (context, state) {
         if (state is InstructorScheduleLoaded) {
           Schedule schedule = state.scheduleModel;
-          _setDate(schedule);
-          _setScheduleTotal();
           return Container(
-              margin: EdgeInsets.only(top: 15),
+              margin: EdgeInsets.only(top: 15, bottom: 15),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,19 +514,7 @@ class _InstructorPageState extends State<InstructorPage> {
                               Text('Upcoming Class',
                                   style: sWhiteTextStyle.copyWith(
                                       fontSize: 16, fontWeight: semiBold)),
-                              (schedule.message!.length == 0)
-                                  ? Text("There's no Schedule avaliable",
-                                      style:
-                                          sGreyTextStyle.copyWith(fontSize: 22))
-                                  : Text('${_setDate(schedule)}',
-                                      style: sWhiteTextStyle.copyWith(
-                                          fontSize: 22, fontWeight: semiBold)),
-                              (schedule.message!.length == 0)
-                                  ? SizedBox()
-                                  : Text(
-                                      '${schedule.message![0].fromTime.toString()} - ${_setDatetimeSchedule(schedule.message![0].scheduleDate.toString())}',
-                                      style: sGreyTextStyle.copyWith(
-                                          fontSize: 14, fontWeight: semiBold)),
+                              _setDate(schedule),
                               const Divider(
                                 height: 20,
                                 thickness: 1,
@@ -561,7 +555,6 @@ class _InstructorPageState extends State<InstructorPage> {
         listener: (context, state) {
           if (state is StudentGroupLoaded) {
             _setStudentGroupTotal();
-            print('loaded ');
           }
         },
         builder: (context, state) {
@@ -620,7 +613,7 @@ class _InstructorPageState extends State<InstructorPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'See your Student List',
+                                      'See your Student Group List',
                                       style: sWhiteTextStyle.copyWith(
                                           fontSize: 14, fontWeight: semiBold),
                                     ),
@@ -638,7 +631,11 @@ class _InstructorPageState extends State<InstructorPage> {
                   ],
                 ));
           } else {
-            return Container();
+            return Container(
+                height: MediaQuery.of(context).size.height / 1.5,
+                child: Center(
+                    child: Text('Loading your Student Data...',
+                        style: sWhiteTextStyle)));
           }
         });
   }
@@ -741,7 +738,7 @@ class _InstructorPageState extends State<InstructorPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => InstructorGroupPage()));  
+                          builder: (context) => InstructorGroupPage()));
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -756,7 +753,7 @@ class _InstructorPageState extends State<InstructorPage> {
                         Text('Instructor total',
                             style: sWhiteTextStyle.copyWith(
                                 fontSize: 16, fontWeight: semiBold)),
-                        Text("${studentlength} Instructor",
+                        Text("${instructorLength} Instructor",
                             style: sWhiteTextStyle.copyWith(fontSize: 22)),
                         const SizedBox(),
                         const Divider(
@@ -795,6 +792,48 @@ class _InstructorPageState extends State<InstructorPage> {
     });
   }
 
+  _setInstructorTotal() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var user = pref.getString("username");
+    var pass = pref.getString('password');
+    var email = pref.getString('instructor-email');
+    var company = pref.getString('instructor-company');
+    final cookieJar = CookieJar();
+
+    var site = 'njajal';
+
+    var listCode = [];
+    var listMap = [];
+
+    dio.interceptors.add(CookieManager(cookieJar));
+    final response = await dio
+        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+      'usr': user,
+      'pwd': pass,
+    });
+
+    // ! Get Teacher List
+    final getInstructor = await dio.post(
+        'https://${site}.sekolahmusik.co.id/api/method/smi.api.get_teacher_list',
+        data: {
+          'manager_email': '${email}',
+          'company': '${company}',
+        });
+
+    for (var a = 0; a < getInstructor.data['message'].length; a++) {
+      if (mounted) {
+        setState(() {
+          listCode.add(getInstructor.data['message'][a]['name']);
+        });
+      }
+    }
+    if (mounted) {
+      setState(() {
+        instructorLength = listCode.length.toString();
+      });
+    }
+  }
+
   _setScheduleTotal() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
@@ -806,23 +845,34 @@ class _InstructorPageState extends State<InstructorPage> {
   _setDate(schedule) {
     var listDate = [];
 
-    for (var a = 0; a < schedule.message.length; a++) {
-      var replacedFrom =
-          schedule.message[a].scheduleDate.toString().replaceAll('-', '');
-      DateTime now = DateTime.now();
-      String dateFromT = replacedFrom.substring(0, 8);
-      DateTime fromDateTime = DateTime.parse(dateFromT);
+    if (schedule.message.length.toString() == 'null') {
+      return Text("There's no Schedule Avaliable");
+    } else {
+      for (var a = 0; a < schedule.message.length; a++) {
+        var replacedFrom =
+            schedule.message[a].scheduleDate.toString().replaceAll('-', '');
+        DateTime now = DateTime.now();
+        String dateFromT = replacedFrom.substring(0, 8);
+        DateTime fromDateTime = DateTime.parse(dateFromT);
 
-      if (fromDateTime.isAfter(now) == true) {
-        var parsedDate = DateTime.parse(schedule.message[a].scheduleDate);
-        String formattedDate = DateFormat('dd MMMM yyyy').format(parsedDate);
-        listDate.add(schedule.message[a].course.toString() +
-            ' ' +
-            formattedDate.toString());
+        if (fromDateTime.isAfter(now) == true) {
+          var parsedDate = DateTime.parse(schedule.message[a].scheduleDate);
+          String formattedDate = DateFormat('dd MMMM yyyy').format(parsedDate);
+          listDate.add(schedule.message[a].course.toString() +
+              ' ' +
+              formattedDate.toString());
+        }
+      }
+
+      if (listDate.length == 0) {
+        return Text("There's no Upcoming Schedule",
+            style: sGreyTextStyle.copyWith(fontSize: 22));
+      } else {
+        return Text('${listDate.last}',
+            style:
+                sWhiteTextStyle.copyWith(fontSize: 22, fontWeight: semiBold));
       }
     }
-
-    return listDate.last.toString();
   }
 
   _setStudentGroupTotal() async {

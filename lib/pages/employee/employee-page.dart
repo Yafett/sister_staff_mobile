@@ -223,6 +223,7 @@ class _EmployeePageState extends State<EmployeePage> {
             MaterialPageRoute(
                 builder: (context) => ProfilePage(
                       instructor: false,
+                      employee: true,
                     )));
       },
       child: Container(
@@ -255,7 +256,8 @@ class _EmployeePageState extends State<EmployeePage> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfilePage(instructor: false)));
+                builder: (context) =>
+                    ProfilePage(instructor: false, employee: true)));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -660,6 +662,12 @@ class _EmployeePageState extends State<EmployeePage> {
       });
     }
 
-    print('werewolf : ' + leaveLength.toString());
+    if (leaveLength.toString() == 'null') {
+      if (mounted) {
+        setState(() {
+          leaveLength = '0';
+        });
+      }
+    }
   }
 }

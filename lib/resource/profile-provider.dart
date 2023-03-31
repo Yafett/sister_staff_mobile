@@ -27,6 +27,8 @@ class ProfileProvider {
 
       var emailUser = pref.getString('user-email');
 
+      print('Hualien : ${emailUser.toString()}');
+
       final request = await dio.get(
           "https://njajal.sekolahmusik.co.id/api/resource/User/${emailUser}");
 
