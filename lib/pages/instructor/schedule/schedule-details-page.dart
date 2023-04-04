@@ -86,6 +86,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> {
     return Scaffold(
       backgroundColor: sBlackColor,
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: sBlackColor,
         leading: const BackButton(color: Color(0xffC9D1D9)),
         title: Text('Details  ',
@@ -128,18 +129,24 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> {
 
   Widget _buildScheduleHeader() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const CircleAvatar(
-        backgroundColor: Colors.white,
-        radius: 30,
-        backgroundImage: AssetImage('assets/images/staff-profile.jpg'),
+      Container(
+        height: 80,
+        width: 80,
+        decoration: BoxDecoration(
+            color: Colors.red,
+            image: const DecorationImage(
+              image: AssetImage('assets/images/default.jpg'),
+              fit: BoxFit.fitHeight,
+            ),
+            borderRadius: BorderRadius.circular(8)),
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 10),
       Text(widget.title,
           style: sWhiteTextStyle.copyWith(
               fontWeight: FontWeight.bold, fontSize: 20)),
-      Text(
-          'lorem ipsum dolor sit amet, consectetur adipiscing, lorem ipsum dolor sit amet, si consectetur adipiscing name',
-          style: sGreyTextStyle.copyWith(fontWeight: semiBold, fontSize: 16)),
+      // Text(
+      //     '',
+      //     style: sGreyTextStyle.copyWith(fontWeight: semiBold, fontSize: 16)),
     ]);
   }
 
@@ -148,7 +155,7 @@ class ScheduleDetailPageState extends State<ScheduleDetailPage> {
     String formattedEndDate = DateFormat('hh:mm a').format(widget.endDate);
     String formattedStartDate = DateFormat('hh:mm a').format(widget.startDate);
     return Container(
-      margin: EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: 15),
       width: MediaQuery.of(context).size.width,
       height: 300,
       child: Column(

@@ -1,5 +1,7 @@
 // ignore_for_file: unused_local_variable, prefer_interpolation_to_compose_strings, avoid_print
 
+import 'dart:developer';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -24,6 +26,8 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
 
   bool isLoading = true;
 
+  var totalEnabled;
+  var totalDraft;
   var listStudentGroup = [];
 
   GoogleMapController? controller;
@@ -74,6 +78,7 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
     return Scaffold(
       backgroundColor: const Color(0xff0D1117),
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: const Color(0xff0D1117),
         centerTitle: true,
         actions: const [],
@@ -82,10 +87,11 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
         behavior: NoScrollWaves(),
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildStudentGroupDetail(),
                 _buildStudentGroupList(),
               ],
             ),
@@ -104,6 +110,7 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
                   style: sWhiteTextStyle)));
     } else {
       return Container(
+        padding: EdgeInsets.symmetric(horizontal: 20),
         color: sBlackColor,
         child: Column(
           children: <Widget>[
@@ -114,6 +121,72 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
         ),
       );
     }
+  }
+
+  Widget _buildStudentGroupDetail() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      margin: EdgeInsets.only(bottom: 10),
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          color: Color(0xff30363D),
+        ),
+        width: MediaQuery.of(context).size.width,
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Container(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.drafts_outlined,
+                  color: sWhiteColor,
+                  size: 35,
+                ),
+                SizedBox(width: 5),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        totalDraft.toString() == 'null'
+                            ? '0'
+                            : totalDraft.toString(),
+                        style: sWhiteTextStyle.copyWith(fontSize: 16)),
+                    Text('Draft Leave', style: sGreyTextStyle),
+                  ],
+                )
+              ],
+            ),
+          ),
+          VerticalDivider(
+            thickness: 1,
+            width: 20,
+            color: sWhiteColor,
+          ),
+          Container(
+            child: Row(children: [
+              Icon(
+                Icons.event_available_outlined,
+                color: sWhiteColor,
+                size: 35,
+              ),
+              SizedBox(width: 5),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      totalEnabled.toString() == 'null'
+                          ? '0'
+                          : totalEnabled.toString(),
+                      style: sWhiteTextStyle.copyWith(fontSize: 16)),
+                  Text('Enabled Leave', style: sGreyTextStyle),
+                ],
+              )
+            ]),
+          ),
+        ]),
+      ),
+    );
   }
 
   Widget _buildStudentGroupCard(sgroup) {
@@ -264,13 +337,13 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+        .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
       'usr': user,
       'pwd': pass,
     });
 
     final getCode = await dio.get(
-      'https://njajal.sekolahmusik.co.id/api/resource/Student%20Group?fields=["name"]&filters=[["Student Group Instructor","instructor","=","${name}"]]',
+      'https://${baseUrl}.sekolahmusik.co.id/api/resource/Student%20Group?fields=["name"]&filters=[["Student Group Instructor","instructor","=","${name}"]]',
     );
 
     for (var a = 0; a < getCode.data['data'].length; a++) {
@@ -281,37 +354,46 @@ class _StudentGroupListPageState extends State<StudentGroupListPage> {
       }
     }
 
-    print('code : ' + listCode.toString());
-
     dio.interceptors.add(CookieManager(cookieJar));
     final adminLog = await dio
-        .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+        .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
       'usr': user,
       'pwd': pass,
     });
 
     for (var a = 0; a < listCode.length; a++) {
       final getStudentDetail = await dio.get(
-          "https://njajal.sekolahmusik.co.id/api/resource/Student Group/${listCode[a]}");
+          "https://${baseUrl}.sekolahmusik.co.id/api/resource/Student Group/${listCode[a]}");
 
       if (mounted) {
         setState(() {
           listStudentGroup.add(getStudentDetail.data);
         });
       }
+    }
 
-      print(listStudentGroup.toString());
+    var listEnabled = [];
+    var listDraft = [];
+
+    for (var a = 0; a < listStudentGroup.length; a++) {
+      if (listStudentGroup[a]['data']['docstatus'].toString() != '0') {
+        listDraft.add(listStudentGroup[a]['data']['docstatus']);
+      } else {
+        listEnabled.add(listStudentGroup[a]['data']['docstatus']);
+      }
     }
 
     if (mounted) {
       setState(() {
         isLoading = false;
+        totalEnabled = listEnabled.length.toString();
+        totalDraft = listDraft.length.toString();
       });
     }
   }
 
   _buildStatus(sgroup) {
-    if (sgroup['data']['docstatus'].toString() == '0') {
+    if (sgroup['data']['docstatus'].toString() != '0') {
       return Container(
         width: 70,
         padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),

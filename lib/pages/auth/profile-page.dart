@@ -46,6 +46,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final _instructorCompanyController = TextEditingController();
   final _instructorCompanyAbbrController = TextEditingController();
 
+  var isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -108,7 +110,14 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           );
         } else {
-          return Container();
+          return Container(
+              height: MediaQuery.sizeOf(context).height / 1.5,
+              child: Center(
+                child: Text(
+                  'Loading your Profile Data..',
+                  style: sWhiteTextStyle,
+                ),
+              ));
         }
       },
     );
@@ -147,7 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
         decoration: BoxDecoration(
             color: Colors.red,
             image: const DecorationImage(
-              image: AssetImage('assets/images/staff-profile.jpg'),
+              image: AssetImage('assets/images/default.jpg'),
               fit: BoxFit.fitHeight,
             ),
             borderRadius: BorderRadius.circular(8)),

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sister_staff_mobile/models/Employee-model.dart';
 import 'package:sister_staff_mobile/models/Instructor-model.dart';
 import 'package:sister_staff_mobile/models/User-model.dart';
+import 'package:sister_staff_mobile/shared/themes.dart';
 
 class ProfileProvider {
   final dio = Dio();
@@ -20,7 +21,7 @@ class ProfileProvider {
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
-          .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
         'usr': user,
         'pwd': pass,
       });
@@ -30,7 +31,7 @@ class ProfileProvider {
       print('Hualien : ${emailUser.toString()}');
 
       final request = await dio.get(
-          "https://njajal.sekolahmusik.co.id/api/resource/User/${emailUser}");
+          "https://${baseUrl}.sekolahmusik.co.id/api/resource/User/${emailUser}");
 
       return User.fromJson(request.data);
     } catch (error) {
@@ -48,16 +49,16 @@ class ProfileProvider {
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
-          .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
         'usr': user,
         'pwd': pass,
       });
 
       final getCode = await dio
-          .get('https://njajal.sekolahmusik.co.id/api/resource/Employee/');
+          .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Employee/');
 
       final getEmployee = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Employee/${getCode.data['data'][0]['name']}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Employee/${getCode.data['data'][0]['name']}');
 
       return Employee.fromJson(getEmployee.data);
     } catch (error, stacktrace) {
@@ -79,16 +80,16 @@ class ProfileProvider {
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
-          .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
         'usr': user,
         'pwd': pass,
       });
 
       final getCode = await dio
-          .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+          .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
 
       final getInstructor = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${getCode.data['data'][0]['name']}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/${getCode.data['data'][0]['name']}');
 
       print('fox : ' + getInstructor.data.toString());
 
@@ -102,7 +103,7 @@ class ProfileProvider {
           getInstructor.data['data']['company'].toString());
 
       final getstudentLength = await dio.post(
-          "https://njajal.sekolahmusik.co.id/api/method/smi.api.get_student_list",
+          "https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_student_list",
           data: {
             'user': '${getInstructor.data['data']['instructor_email']}',
           });

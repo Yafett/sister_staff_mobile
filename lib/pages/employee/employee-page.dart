@@ -63,67 +63,73 @@ class _EmployeePageState extends State<EmployeePage> {
       builder: (context, state) {
         if (state is GetProfileEmployeeLoaded) {
           Employee employee = state.employeeModel;
-          return SideMenu(
-            key: _endSideMenuKey,
-            inverse: true, // end side menu
-            background: Colors.green[700],
-            type: SideMenuType.slideNRotate,
-            menu: Padding(
-              padding: const EdgeInsets.only(left: 25.0),
-              child: _buildSidebar(employee),
-            ),
-            maxMenuWidth: 250,
-            onChange: (_isOpened) {
-              if (mounted) {
-                setState(() => isOpened = _isOpened);
-              }
-            },
+          return GestureDetector(
+            onTap: () => _setToggleMenu(false),
             child: SideMenu(
-              maxMenuWidth: 250,
-              radius: BorderRadius.circular(12),
-              background: const Color.fromARGB(255, 41, 41, 41),
-              key: _sideMenuKey,
-              menu: _buildSidebar(employee),
+              key: _endSideMenuKey,
+              inverse: true, // end side menu
+              background: Colors.green[700],
               type: SideMenuType.slideNRotate,
+              menu: Padding(
+                padding: const EdgeInsets.only(left: 25.0),
+                child: _buildSidebar(employee),
+              ),
+              maxMenuWidth: 250,
               onChange: (_isOpened) {
                 if (mounted) {
                   setState(() => isOpened = _isOpened);
                 }
               },
-              child: IgnorePointer(
-                ignoring: isOpened,
-                child: Scaffold(
-                  backgroundColor: const Color(0xff0D1117),
-                  appBar: AppBar(
-                    backgroundColor: const Color(0xff0D1117),
-                    centerTitle: true,
-                    leading: IconButton(
-                      icon: const Icon(Icons.menu, size: 30),
-                      onPressed: () => _setToggleMenu(),
-                    ),
-                    actions: const [
-                      Icon(Icons.qr_code_scanner,
-                          size: 30, color: Color(0xffC9D1D9)),
-                      SizedBox(width: 20),
-                    ],
-                  ),
-                  body: ScrollConfiguration(
-                    behavior: NoScrollWaves(),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildProfilePicture(),
-                          _buildProfileTitle(employee.data),
-                          _buildProfileChip(),
-                          SizedBox(height: 10),
-                          _buildAttendanceSection(),
-                          SizedBox(height: 10),
-                          const SizedBox(height: 5),
-                          _buildLeaveSection(),
-                          SizedBox(height: 10),
-                          // _buildLeaveAllocationSection(),
+              child: GestureDetector(
+                onTap: () => _setToggleMenu(false),
+                child: SideMenu(
+                  maxMenuWidth: 250,
+                  radius: BorderRadius.circular(12),
+                  background: const Color.fromARGB(255, 41, 41, 41),
+                  key: _sideMenuKey,
+                  menu: _buildSidebar(employee),
+                  type: SideMenuType.slideNRotate,
+                  onChange: (_isOpened) {
+                    if (mounted) {
+                      setState(() => isOpened = _isOpened);
+                    }
+                  },
+                  child: IgnorePointer(
+                    ignoring: isOpened,
+                    child: Scaffold(
+                      backgroundColor: const Color(0xff0D1117),
+                      appBar: AppBar(
+                        backgroundColor: const Color(0xff0D1117),
+                        centerTitle: true,
+                        leading: IconButton(
+                          icon: const Icon(Icons.menu, size: 30),
+                          onPressed: () => _setToggleMenu(),
+                        ),
+                        actions: const [
+                          Icon(Icons.qr_code_scanner,
+                              size: 30, color: Color(0xffC9D1D9)),
+                          SizedBox(width: 20),
                         ],
+                      ),
+                      body: ScrollConfiguration(
+                        behavior: NoScrollWaves(),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildProfilePicture(),
+                              _buildProfileTitle(employee.data),
+                              _buildProfileChip(),
+                              SizedBox(height: 10),
+                              _buildAttendanceSection(),
+                              SizedBox(height: 10),
+                              const SizedBox(height: 5),
+                              _buildLeaveSection(),
+                              SizedBox(height: 10),
+                              // _buildLeaveAllocationSection(),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -153,8 +159,7 @@ class _EmployeePageState extends State<EmployeePage> {
                 CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 22.0,
-                  backgroundImage:
-                      AssetImage('assets/images/smi-logo-white.png'),
+                  backgroundImage: AssetImage('assets/images/default.jpg'),
                 ),
                 SizedBox(height: 16.0),
                 Text(
@@ -239,7 +244,7 @@ class _EmployeePageState extends State<EmployeePage> {
                   decoration: BoxDecoration(
                       color: Colors.red,
                       image: const DecorationImage(
-                        image: AssetImage('assets/images/staff-profile.jpg'),
+                        image: AssetImage('assets/images/default.jpg'),
                         fit: BoxFit.fitHeight,
                       ),
                       borderRadius: BorderRadius.circular(8)),

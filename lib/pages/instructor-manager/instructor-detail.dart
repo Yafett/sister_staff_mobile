@@ -46,10 +46,7 @@ class _InstructorManagerDetailPageState
     super.initState();
     listRawStudent = widget.studentList;
     listSchedule = widget.scheduleList;
-    log(listSchedule.toString());
     _fetchStudentProfile();
-
-    log(widget.scheduleList.length.toString());
   }
 
   @override
@@ -93,7 +90,7 @@ class _InstructorManagerDetailPageState
             decoration: const BoxDecoration(
                 color: Colors.red,
                 image: DecorationImage(
-                  image: AssetImage('assets/images/staff-profile.jpg'),
+                  image: AssetImage('assets/images/default.jpg'),
                   fit: BoxFit.fitHeight,
                 ),
                 borderRadius: BorderRadius.all(Radius.circular(4))),
@@ -102,9 +99,14 @@ class _InstructorManagerDetailPageState
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.instructorName,
-                  style: sWhiteTextStyle.copyWith(
-                      fontSize: 20, fontWeight: semiBold)),
+              Container(
+                width: 250,
+                child: Text(widget.instructorName,
+                    style: sWhiteTextStyle.copyWith(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 20,
+                        fontWeight: semiBold)),
+              ),
               Text(
                 widget.instructor,
                 style: sGreyTextStyle,
@@ -225,7 +227,7 @@ class _InstructorManagerDetailPageState
                               color: Colors.red,
                               image: DecorationImage(
                                 image: AssetImage(
-                                    'assets/images/staff-profile.jpg'),
+                                    'assets/images/default.jpg'),
                                 fit: BoxFit.fitHeight,
                               ),
                               borderRadius:
@@ -724,14 +726,16 @@ class _InstructorManagerDetailPageState
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
-      'usr': user,
-      'pwd': pass,
+        .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
+      'usr': 'administrator',
+      'pwd': 'admin',
     });
+
+    log(listRawStudent.toString());
 
     for (var a = 0; a < listRawStudent.length; a++) {
       final getStudent = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Student/${listRawStudent[a]}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Student/${listRawStudent[a]}');
 
       if (mounted) {
         setState(() {

@@ -158,7 +158,10 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ProfilePage(instructor: false, employee: false,)));
+                    builder: (context) => ProfilePage(
+                          instructor: false,
+                          employee: false,
+                        )));
           }
         } else if (state is LoginError) {
           MotionToast(

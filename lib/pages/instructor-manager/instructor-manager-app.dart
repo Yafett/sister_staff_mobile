@@ -53,65 +53,71 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
         if (state is GetProfileUserLoaded) {
           User user = state.userModel;
 
-          return SideMenu(
-            key: _endSideMenuKey,
-            inverse: true, // end side menu
-            background: Colors.green[700],
-            type: SideMenuType.slideNRotate,
-            menu: Padding(
-              padding: const EdgeInsets.only(left: 25.0),
-              child: _buildSidebar(user),
-            ),
-            maxMenuWidth: 250,
-            onChange: (_isOpened) {
-              if (mounted) {
-                setState(() => isOpened = _isOpened);
-              }
-            },
+          return GestureDetector(
+            onTap: () => _setToggleMenu(false),
             child: SideMenu(
-              maxMenuWidth: 250,
-              radius: BorderRadius.circular(12),
-              background: const Color.fromARGB(255, 41, 41, 41),
-              key: _sideMenuKey,
-              menu: _buildSidebar(user),
+              key: _endSideMenuKey,
+              inverse: true, // end side menu
+              background: Colors.green[700],
               type: SideMenuType.slideNRotate,
+              menu: Padding(
+                padding: const EdgeInsets.only(left: 25.0),
+                child: _buildSidebar(user),
+              ),
+              maxMenuWidth: 250,
               onChange: (_isOpened) {
                 if (mounted) {
                   setState(() => isOpened = _isOpened);
                 }
               },
-              child: IgnorePointer(
-                ignoring: isOpened,
-                child: Scaffold(
-                  backgroundColor: const Color(0xff0D1117),
-                  appBar: AppBar(
-                    elevation: 0,
-                    backgroundColor: const Color(0xff0D1117),
-                    centerTitle: true,
-                    leading: IconButton(
-                      icon: const Icon(
-                        Icons.menu,
-                        size: 30,
-                      ),
-                      onPressed: () => _setToggleMenu(),
-                    ),
-                    actions: const [
-                      Icon(Icons.qr_code_scanner,
-                          size: 30, color: Color(0xffC9D1D9)),
-                      SizedBox(width: 20),
-                    ],
-                  ),
-                  body: ScrollConfiguration(
-                    behavior: NoScrollWaves(),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildProfilePicture(),
-                          _buildProfileTitle(user.data),
-                          _buildProfileChip(),
-                          _buildInstructorSection()
+              child: GestureDetector(
+                onTap: () => _setToggleMenu(false),
+                child: SideMenu(
+                  maxMenuWidth: 250,
+                  radius: BorderRadius.circular(12),
+                  background: const Color.fromARGB(255, 41, 41, 41),
+                  key: _sideMenuKey,
+                  menu: _buildSidebar(user),
+                  type: SideMenuType.slideNRotate,
+                  onChange: (_isOpened) {
+                    if (mounted) {
+                      setState(() => isOpened = _isOpened);
+                    }
+                  },
+                  child: IgnorePointer(
+                    ignoring: isOpened,
+                    child: Scaffold(
+                      backgroundColor: const Color(0xff0D1117),
+                      appBar: AppBar(
+                        elevation: 0,
+                        backgroundColor: const Color(0xff0D1117),
+                        centerTitle: true,
+                        leading: IconButton(
+                          icon: const Icon(
+                            Icons.menu,
+                            size: 30,
+                          ),
+                          onPressed: () => _setToggleMenu(),
+                        ),
+                        actions: const [
+                          Icon(Icons.qr_code_scanner,
+                              size: 30, color: Color(0xffC9D1D9)),
+                          SizedBox(width: 20),
                         ],
+                      ),
+                      body: ScrollConfiguration(
+                        behavior: NoScrollWaves(),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildProfilePicture(),
+                              _buildProfileTitle(user.data),
+                              _buildProfileChip(),
+                              _buildInstructorSection()
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -120,9 +126,16 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
             ),
           );
         } else {
-          return Text(
-            'Edgerunner',
-            style: sWhiteTextStyle,
+          return Scaffold(
+            body: Container(
+              color: sBlackColor,
+              child: Center(
+                child: Text(
+                  'Loading your Data..',
+                  style: sWhiteTextStyle,
+                ),
+              ),
+            ),
           );
         }
       },
@@ -144,8 +157,7 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
                 CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 22.0,
-                  backgroundImage:
-                      AssetImage('assets/images/smi-logo-white.png'),
+                  backgroundImage: AssetImage('assets/images/default.jpg'),
                 ),
                 SizedBox(height: 16.0),
                 Text(
@@ -179,8 +191,7 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
                   MaterialPageRoute(
                       builder: (context) => InstructorGroupPage()));
             },
-            leading: const Icon(Icons.school,
-                size: 20.0, color: Colors.white),
+            leading: const Icon(Icons.school, size: 20.0, color: Colors.white),
             title: const Text("Instructor List"),
             textColor: Colors.white,
             dense: true,
@@ -199,7 +210,7 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
                 const Icon(Icons.exit_to_app, size: 20.0, color: Colors.white),
             title: const Text("Logout"),
             textColor: Colors.white,
-            dense: true, 
+            dense: true,
           ),
         ],
       ),
@@ -239,7 +250,7 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
                   decoration: BoxDecoration(
                       color: Colors.red,
                       image: const DecorationImage(
-                        image: AssetImage('assets/images/staff-profile.jpg'),
+                        image: AssetImage('assets/images/default.jpg'),
                         fit: BoxFit.fitHeight,
                       ),
                       borderRadius: BorderRadius.circular(8)),
@@ -399,21 +410,19 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
     var company = pref.getString('instructor-company');
     final cookieJar = CookieJar();
 
-    var site = 'njajal';
-
     var listCode = [];
     var listMap = [];
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
       'usr': user,
       'pwd': pass,
     });
 
     // ! Get Teacher List
     final getInstructor = await dio.post(
-        'https://${site}.sekolahmusik.co.id/api/method/smi.api.get_teacher_list',
+        'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_teacher_list',
         data: {
           'manager_email': '${email}',
           'company': '${company}',

@@ -54,6 +54,7 @@ class _SchedulePageState extends State<SchedulePage> {
     return Scaffold(
       // backgroundColor: sBlackColor,
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: sBlackColor,
         leading: const BackButton(color: Color(0xffC9D1D9)),
         title: Text('Your Schedule',
@@ -180,22 +181,22 @@ class _SchedulePageState extends State<SchedulePage> {
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
       'usr': user,
       'pwd': pass,
     });
 
     if (codeDef == null) {
       final getCode = await dio
-          .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+          .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
 
       final code = getCode.data['data'][0]['name'];
 
       final getEmail = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${code}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/${code}');
 
       final request = await dio.post(
-          'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+          'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
           data: {
             'instructor': email,
             'from_date': yesterday.toString(),
@@ -211,7 +212,7 @@ class _SchedulePageState extends State<SchedulePage> {
       }
     } else {
       final request = await dio.post(
-          'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+          'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
           data: {
             'instructor': email,
             'from_date': yesterday.toString(),

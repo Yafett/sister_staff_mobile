@@ -437,7 +437,7 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
       'usr': user,
       'pwd': pass,
     });
@@ -445,13 +445,13 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
     print(response.data.toString());
 
     final getCode = await dio.get(
-        'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/');
+        'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Application/');
 
     for (var a = 0; a < getCode.data['data'].length; a++) {
       final code = getCode.data['data'][a]['name'].toString();
       print(code.toString());
       final getLeave = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/${code}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Application/${code}');
 
       if (mounted) {
         setState(() {
@@ -515,13 +515,13 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
       'usr': user,
       'pwd': pass,
     });
 
     final getCode = await dio.get(
-        'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/');
+        'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Allocation/');
 
     for (var a = 0; a < getCode.data['data'].length; a++) {
       allocationCode.add(getCode.data['data'][a]['name']);
@@ -529,7 +529,7 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
 
     for (var b = 0; b < allocationCode.length; b++) {
       final getData = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/${allocationCode[b]}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Allocation/${allocationCode[b]}');
 
       if (mounted) {
         setState(() {

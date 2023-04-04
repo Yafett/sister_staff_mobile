@@ -180,13 +180,13 @@ class _LeaveAllocationPageState extends State<LeaveAllocationPage> {
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
       'usr': user,
       'pwd': pass,
     });
 
     final getCode = await dio.get(
-        'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/');
+        'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Allocation/');
 
     for (var a = 0; a < getCode.data['data'].length; a++) {
       allocationCode.add(getCode.data['data'][a]['name']);
@@ -194,7 +194,7 @@ class _LeaveAllocationPageState extends State<LeaveAllocationPage> {
 
     for (var b = 0; b < allocationCode.length; b++) {
       final getData = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/${allocationCode[b]}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Allocation/${allocationCode[b]}');
       allocationList.add(getData.data);
     }
 

@@ -6,6 +6,7 @@ import 'package:sister_staff_mobile/models/Allocation-model.dart';
 import 'package:sister_staff_mobile/models/Leave-model.dart';
 import 'package:sister_staff_mobile/models/Schedule-model.dart';
 import 'package:sister_staff_mobile/models/Student-Group-model.dart';
+import 'package:sister_staff_mobile/shared/themes.dart';
 
 class DataProvider {
   final dio = Dio();
@@ -20,20 +21,20 @@ class DataProvider {
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
-          .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
         'usr': user,
         'pwd': pass,
       });
 
       final getCode = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Application/');
 
       print('raveling : ' + getCode.data['data'].length.toString());
 
       pref.setString('leave-length', getCode.data['data'].length.toString());
 
       final getLeave = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Leave Application/${getCode.data['data'][0]['name']}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Application/${getCode.data['data'][0]['name']}');
 
       return Leave.fromJson(getLeave.data);
     } catch (error, stacktrace) {
@@ -51,13 +52,13 @@ class DataProvider {
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
-          .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
         'usr': user,
         'pwd': pass,
       });
 
       final getCode = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Allocation/');
 
       print('allocation : ' + getCode.data['data'].length.toString());
 
@@ -65,7 +66,7 @@ class DataProvider {
           'allocation-length', getCode.data['data'].length.toString());
 
       final getAllocation = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Leave Allocation/${getCode.data['data'][0]['name']}');
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Allocation/${getCode.data['data'][0]['name']}');
 
       return Allocation.fromJson(getAllocation.data);
     } catch (error, stacktrace) {
@@ -87,22 +88,22 @@ class DataProvider {
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
-          .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+          .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
         'usr': user,
         'pwd': pass,
       });
 
       if (code == null) {
         final getCode = await dio
-            .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+            .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
 
         final code = getCode.data['data'][0]['name'];
 
         final getEmail = await dio.get(
-            'https://njajal.sekolahmusik.co.id/api/resource/Instructor/${code}');
+            'https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/${code}');
 
         final request = await dio.post(
-            'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+            'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
             data: {
               'instructor': getEmail.data['data']['instructor_email'],
               'from_date': yesterday.toString(),
@@ -115,7 +116,7 @@ class DataProvider {
         return Schedule.fromJson(request.data);
       } else {
         final request = await dio.post(
-          'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+          'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
           data: {
             'instructor': code,
             'from_date': yesterday.toString(),
@@ -150,19 +151,19 @@ class DataProvider {
     try {
       dio.interceptors.add(CookieManager(cookieJar));
       final response = await dio
-          .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+          .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
         'usr': user,
         'pwd': pass,
       });
 
       if (code == null) {
         final getCode = await dio
-            .get('https://njajal.sekolahmusik.co.id/api/resource/Instructor/');
+            .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
 
         final code = getCode.data['data'][0]['name'];
 
         final getStudentGroupCode = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Student Group/',
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Student Group/',
         );
 
         print('adada : ' + getStudentGroupCode.data['data'].length.toString());
@@ -172,7 +173,7 @@ class DataProvider {
 
         dio.interceptors.add(CookieManager(cookieJar));
         final response = await dio
-            .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+            .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
           'usr': 'administrator',
           'pwd': 'admin',
         });
@@ -180,13 +181,13 @@ class DataProvider {
         print('limbo : ' + response.data.toString());
 
         final getStudentGroup = await dio.get(
-          'https://njajal.sekolahmusik.co.id/api/resource/Student Group/${getStudentGroupCode.data['data'][0]['name']}',
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Student Group/${getStudentGroupCode.data['data'][0]['name']}',
         );
 
         return StudentGroup.fromJson(getStudentGroup.data);
       } else {
         final request = await dio.post(
-          'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
+          'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_course_schedule',
           data: {
             'instructor': code,
           },

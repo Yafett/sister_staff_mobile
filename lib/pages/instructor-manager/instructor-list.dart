@@ -21,6 +21,9 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
 
   bool isLoading = true;
 
+  var totalActive;
+  var totalLeft;
+
   var listInstructor = [];
 
   var listInstructorTemporary = [];
@@ -50,10 +53,72 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildInstructorDetail(),
               _buildInstructorList(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInstructorDetail() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          color: Color(0xff30363D),
+        ),
+        width: MediaQuery.of(context).size.width,
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Container(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.person_2_outlined,
+                  color: sWhiteColor,
+                  size: 35,
+                ),
+                SizedBox(width: 5),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        '${totalActive.toString() == 'null' ? '0' : totalActive.toString()}',
+                        style: sWhiteTextStyle.copyWith(fontSize: 16)),
+                    Text('Active Instructor', style: sGreyTextStyle),
+                  ],
+                )
+              ],
+            ),
+          ),
+          VerticalDivider(
+            thickness: 1,
+            width: 20,
+            color: sWhiteColor,
+          ),
+          Container(
+            child: Row(children: [
+              Icon(
+                Icons.person_off_outlined,
+                color: sWhiteColor,
+                size: 35,
+              ),
+              SizedBox(width: 5),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      '${totalLeft.toString() == 'null' ? '0' : totalLeft.toString()}',
+                      style: sWhiteTextStyle.copyWith(fontSize: 16)),
+                  Text('Left Instructor', style: sGreyTextStyle),
+                ],
+              )
+            ]),
+          ),
+        ]),
       ),
     );
   }
@@ -63,7 +128,7 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
       return Container(
           height: MediaQuery.of(context).size.height / 1.5,
           child: Center(
-              child: Text('Loading your Student Data...',
+              child: Text('Loading your Instructor Data...',
                   style: sWhiteTextStyle)));
     } else {
       return Container(
@@ -111,8 +176,7 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
                         decoration: const BoxDecoration(
                             color: Colors.red,
                             image: DecorationImage(
-                              image:
-                                  AssetImage('assets/images/staff-profile.jpg'),
+                              image: AssetImage('assets/images/default.jpg'),
                               fit: BoxFit.fitHeight,
                             ),
                             borderRadius: BorderRadius.only(
@@ -218,21 +282,20 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
     var email = pref.getString('instructor-email');
     var company = pref.getString('instructor-company');
 
-    var site = 'njajal';
-
     var listCode = [];
     var listMap = [];
+    var rawInstructorList = [];
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
       'usr': user,
       'pwd': pass,
     });
 
     // ! Get Teacher List
     final getInstructor = await dio.post(
-        'https://${site}.sekolahmusik.co.id/api/method/smi.api.get_teacher_list',
+        'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_teacher_list',
         data: {
           'manager_email': '${email}',
           'company': '${company}',
@@ -247,9 +310,22 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
       }
     }
 
+    var listActive = [];
+    var listNotActive = [];
+    for (var a = 0; a < listInstructorTemporary.length; a++) {
+      if (listInstructorTemporary[a]['status'] == 'Active') {
+        listActive.add(listInstructorTemporary[a]['status']);
+      } else {
+        listNotActive.add(listInstructorTemporary[a]['status']);
+      }
+    }
+
+    log('Scientist : ${listActive.length.toString()}');
+    log('Maine : ${listNotActive.toString()}');
+
     // ! Get Attendance List
     final getAttendance = await dio.post(
-      'https://njajal.sekolahmusik.co.id/api/method/smi.api.get_teacher_student_attendance_list',
+      'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_teacher_student_attendance_list',
       data: {
         'manager_email': '${email}',
         'company': '${company}',
@@ -260,9 +336,16 @@ class _InstructorGroupPageState extends State<InstructorGroupPage> {
       if (mounted) {
         setState(() {
           listInstructor.add(getAttendance.data['message']);
-          isLoading = false;
         });
       }
+    }
+
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+        totalActive = listActive.length.toString();
+        totalLeft = listNotActive.length.toString();
+      });
     }
   }
 

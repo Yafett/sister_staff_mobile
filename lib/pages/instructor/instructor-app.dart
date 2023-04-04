@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_is_empty, prefer_const_constructors
 
+import 'dart:developer';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -26,7 +28,10 @@ import 'package:slide_digital_clock/slide_digital_clock.dart';
 
 class InstructorPage extends StatefulWidget {
   bool? manager;
-  InstructorPage({super.key, this.manager});
+  InstructorPage({
+    super.key,
+    this.manager,
+  });
 
   @override
   State<InstructorPage> createState() => _InstructorPageState();
@@ -68,71 +73,81 @@ class _InstructorPageState extends State<InstructorPage> {
       builder: (context, state) {
         if (state is GetProfileInstructorLoaded) {
           Instructor instructor = state.instructorModel;
-          return SideMenu(
-            key: _endSideMenuKey,
-            inverse: true, // end side menu
-            background: Colors.green[700],
-            type: SideMenuType.slideNRotate,
-            menu: Padding(
-              padding: const EdgeInsets.only(left: 25.0),
-              child: _buildSidebar(instructor),
-            ),
-            maxMenuWidth: 250,
-            onChange: (_isOpened) {
-              if (mounted) {
-                setState(() => isOpened = _isOpened);
-              }
+          return GestureDetector(
+            onTap: () {
+              _setToggleMenu(false);
             },
             child: SideMenu(
-              maxMenuWidth: 250,
-              radius: BorderRadius.circular(12),
-              background: const Color.fromARGB(255, 41, 41, 41),
-              key: _sideMenuKey,
-              menu: _buildSidebar(instructor),
+              key: _endSideMenuKey,
+              inverse: false,
+              background: Colors.green[700],
               type: SideMenuType.slideNRotate,
+              menu: Padding(
+                padding: const EdgeInsets.only(left: 25.0),
+                child: _buildSidebar(instructor),
+              ),
+              maxMenuWidth: 250,
               onChange: (_isOpened) {
                 if (mounted) {
                   setState(() => isOpened = _isOpened);
                 }
               },
-              child: IgnorePointer(
-                ignoring: isOpened,
-                child: Scaffold(
-                  backgroundColor: const Color(0xff0D1117),
-                  appBar: AppBar(
-                    elevation: 0,
-                    backgroundColor: const Color(0xff0D1117),
-                    centerTitle: true,
-                    leading: IconButton(
-                      icon: const Icon(
-                        Icons.menu,
-                        size: 30,
-                      ),
-                      onPressed: () => _setToggleMenu(),
-                    ),
-                    actions: const [
-                      Icon(Icons.qr_code_scanner,
-                          size: 30, color: Color(0xffC9D1D9)),
-                      SizedBox(width: 20),
-                    ],
-                  ),
-                  body: ScrollConfiguration(
-                    behavior: NoScrollWaves(),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildProfilePicture(),
-                          _buildProfileTitle(instructor.data),
-                          _buildProfileChip(),
-                          _buildStudentSection(instructor.data),
-                          widget.manager == true
-                              ? _buildInstructorSection()
-                              : Container(),
-                          _buildStudentGroupSection(),
-                          _buildScheduleSection(),
-                          // const SizedBox(height: 30),
+              child: GestureDetector(
+                onTap: () {
+                  _setToggleMenu(false);
+                },
+                child: SideMenu(
+                  maxMenuWidth: 250,
+                  radius: BorderRadius.circular(12),
+                  background: const Color.fromARGB(255, 41, 41, 41),
+                  key: _sideMenuKey,
+                  menu: _buildSidebar(instructor),
+                  type: SideMenuType.slideNRotate,
+                  onChange: (_isOpened) {
+                    if (mounted) {
+                      setState(() => isOpened = _isOpened);
+                    }
+                  },
+                  child: IgnorePointer(
+                    ignoring: isOpened,
+                    child: Scaffold(
+                      backgroundColor: const Color(0xff0D1117),
+                      appBar: AppBar(
+                        elevation: 0,
+                        backgroundColor: const Color(0xff0D1117),
+                        centerTitle: true,
+                        leading: IconButton(
+                          icon: const Icon(
+                            Icons.menu,
+                            size: 30,
+                          ),
+                          onPressed: () => _setToggleMenu(),
+                        ),
+                        actions: const [
+                          Icon(Icons.qr_code_scanner,
+                              size: 30, color: Color(0xffC9D1D9)),
+                          SizedBox(width: 20),
                         ],
+                      ),
+                      body: ScrollConfiguration(
+                        behavior: NoScrollWaves(),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildProfilePicture(),
+                              _buildProfileTitle(instructor.data),
+                              _buildProfileChip(),
+                              _buildStudentSection(instructor.data),
+                              widget.manager == true
+                                  ? _buildInstructorSection()
+                                  : Container(),
+                              _buildStudentGroupSection(),
+                              _buildScheduleSection(),
+                              // const SizedBox(height: 30),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -162,12 +177,11 @@ class _InstructorPageState extends State<InstructorPage> {
                 CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 22.0,
-                  backgroundImage:
-                      AssetImage('assets/images/smi-logo-white.png'),
+                  backgroundImage: AssetImage('assets/images/default.jpg'),
                 ),
                 SizedBox(height: 16.0),
                 Text(
-                  'Hello,s ${instructor.data.instructorName.toString()}',
+                  'Hello, ${instructor.data.instructorName.toString()}',
                   style: TextStyle(color: Colors.white),
                 ),
                 SizedBox(height: 20.0),
@@ -179,7 +193,10 @@ class _InstructorPageState extends State<InstructorPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ProfilePage(instructor: true, employee: true,)));
+                      builder: (context) => ProfilePage(
+                            instructor: true,
+                            employee: true,
+                          )));
             },
             leading: const Icon(Icons.person_outline,
                 size: 20.0, color: Colors.white),
@@ -193,7 +210,7 @@ class _InstructorPageState extends State<InstructorPage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => StudentListPage(
-                            code: instructor.instructorEmail.toString(),
+                            code: instructor.data.instructorEmail.toString(),
                           )));
             },
             leading: const Icon(Icons.location_history_outlined,
@@ -202,6 +219,21 @@ class _InstructorPageState extends State<InstructorPage> {
             textColor: Colors.white,
             dense: true,
           ),
+          widget.manager == true
+              ? ListTile(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => InstructorGroupPage()));
+                  },
+                  leading:
+                      const Icon(Icons.school, size: 20.0, color: Colors.white),
+                  title: const Text("Instructor"),
+                  textColor: Colors.white,
+                  dense: true,
+                )
+              : Container(),
           ListTile(
             onTap: () {
               Navigator.push(
@@ -212,6 +244,17 @@ class _InstructorPageState extends State<InstructorPage> {
             leading: const Icon(Icons.group_outlined,
                 size: 20.0, color: Colors.white),
             title: const Text("Student Group"),
+            textColor: Colors.white,
+            dense: true,
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SchedulePage()));
+            },
+            leading: const Icon(Icons.accessible_forward_rounded,
+                size: 20.0, color: Colors.white),
+            title: const Text("Schedule"),
             textColor: Colors.white,
             dense: true,
           ),
@@ -244,7 +287,10 @@ class _InstructorPageState extends State<InstructorPage> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfilePage(instructor: true, employee: true,)));
+                builder: (context) => ProfilePage(
+                      instructor: true,
+                      employee: true,
+                    )));
       },
       child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -257,7 +303,10 @@ class _InstructorPageState extends State<InstructorPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ProfilePage(instructor: true, employee: true,)));
+                          builder: (context) => ProfilePage(
+                                instructor: true,
+                                employee: true,
+                              )));
                 },
                 child: Container(
                   height: 80,
@@ -265,7 +314,7 @@ class _InstructorPageState extends State<InstructorPage> {
                   decoration: BoxDecoration(
                       color: Colors.red,
                       image: const DecorationImage(
-                        image: AssetImage('assets/images/staff-profile.jpg'),
+                        image: AssetImage('assets/images/default.jpg'),
                         fit: BoxFit.fitHeight,
                       ),
                       borderRadius: BorderRadius.circular(8)),
@@ -323,7 +372,10 @@ class _InstructorPageState extends State<InstructorPage> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfilePage(instructor: true, employee: true,)));
+                builder: (context) => ProfilePage(
+                      instructor: true,
+                      employee: true,
+                    )));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -357,17 +409,19 @@ class _InstructorPageState extends State<InstructorPage> {
             child:
                 _buildChip('${studentlength.toString()} Student', Icons.person),
           ),
-          GestureDetector(
-            child: _buildChip(
-                '${instructorLength.toString()} Instructor', Icons.school),
-          ),
+          widget.manager == true
+              ? GestureDetector(
+                  child: _buildChip('${instructorLength.toString()} Instructor',
+                      Icons.school),
+                )
+              : Container(),
           GestureDetector(
             child: _buildChip(
                 '${sgrouplength.toString()} Student Group', Icons.group),
           ),
           GestureDetector(
-            child: _buildChip(
-                '${schedulelength.toString()} Schedule', Icons.group),
+            child: _buildChip('${schedulelength.toString()} Schedule',
+                Icons.accessible_forward_rounded),
           ),
         ],
       ),
@@ -755,7 +809,6 @@ class _InstructorPageState extends State<InstructorPage> {
                                 fontSize: 16, fontWeight: semiBold)),
                         Text("${instructorLength} Instructor",
                             style: sWhiteTextStyle.copyWith(fontSize: 22)),
-                        const SizedBox(),
                         const Divider(
                           height: 20,
                           thickness: 1,
@@ -800,21 +853,19 @@ class _InstructorPageState extends State<InstructorPage> {
     var company = pref.getString('instructor-company');
     final cookieJar = CookieJar();
 
-    var site = 'njajal';
-
     var listCode = [];
     var listMap = [];
 
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post('https://njajal.sekolahmusik.co.id/api/method/login', data: {
+        .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
       'usr': user,
       'pwd': pass,
     });
 
     // ! Get Teacher List
     final getInstructor = await dio.post(
-        'https://${site}.sekolahmusik.co.id/api/method/smi.api.get_teacher_list',
+        'https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_teacher_list',
         data: {
           'manager_email': '${email}',
           'company': '${company}',

@@ -84,7 +84,7 @@ class _StudentListPageState extends State<StudentListPage> {
   Widget _buildStudentCard(student) {
     final String image;
     if (student['image'].toString()[0] == '/') {
-      image = 'https://njajal.sekolahmusik.co.id${student['image']}';
+      image = 'https://${baseUrl}.sekolahmusik.co.id${student['image']}';
     } else {
       image = student['image'].toString();
     }
@@ -97,7 +97,7 @@ class _StudentListPageState extends State<StudentListPage> {
           borderRadius: BorderRadius.circular(8),
           child: InkWell(
             borderRadius: BorderRadius.circular(8),
-            splashColor: sGreyColor,
+            splashColor: sBlackColor,
             onTap: () {},
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -128,7 +128,7 @@ class _StudentListPageState extends State<StudentListPage> {
                               color: Colors.red,
                               image: DecorationImage(
                                 image: AssetImage(
-                                    'assets/images/staff-profile.jpg'),
+                                    'assets/images/default.jpg'),
                                 fit: BoxFit.fitHeight,
                               ),
                               borderRadius: BorderRadius.only(
@@ -180,7 +180,7 @@ class _StudentListPageState extends State<StudentListPage> {
                                 vertical: 3, horizontal: 10),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
-                              color: (student['status'].toString() == 'Active') 
+                              color: (student['status'].toString() == 'Active')
                                   ? Color(0xff237D29)
                                   : Color(0xff242A30),
                             ),
@@ -221,13 +221,13 @@ class _StudentListPageState extends State<StudentListPage> {
   _fetchStudent(code) async {
     dio.interceptors.add(CookieManager(cookieJar));
     final response = await dio
-        .post("https://njajal.sekolahmusik.co.id/api/method/login", data: {
+        .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
       'usr': 'administrator',
       'pwd': 'admin',
     });
 
     final getCode = await dio.post(
-        "https://njajal.sekolahmusik.co.id/api/method/smi.api.get_student_list",
+        "https://${baseUrl}.sekolahmusik.co.id/api/method/smi.api.get_student_list",
         data: {
           'user': code,
         });
