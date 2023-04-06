@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +41,8 @@ class _EmployeePageState extends State<EmployeePage> {
   final _leaveBloc = GetLeaveApplicationBloc();
   final _allocationBloc = GetLeaveAllocationBloc();
 
+  String _scanResult = 'No data yet';
+
   var leaveLength;
   var allocationLength;
 
@@ -64,7 +67,13 @@ class _EmployeePageState extends State<EmployeePage> {
         if (state is GetProfileEmployeeLoaded) {
           Employee employee = state.employeeModel;
           return GestureDetector(
-            onTap: () => _setToggleMenu(false),
+            onTap: () {
+              final _state = _endSideMenuKey.currentState!;
+              final _state2 = _sideMenuKey.currentState!;
+
+              _state.closeSideMenu();
+              _state2.closeSideMenu();
+            },
             child: SideMenu(
               key: _endSideMenuKey,
               inverse: true, // end side menu
@@ -674,5 +683,14 @@ class _EmployeePageState extends State<EmployeePage> {
         });
       }
     }
+  }
+
+  Future<void> _scanQR() async {
+    String result = await FlutterBarcodeScanner.scanBarcode(
+        "#FF0000", "Cancel", true, ScanMode.QR);
+
+    setState(() {
+      _scanResult = result;
+    });
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors_in_immutables
+
 part of 'get_leave_allocation_bloc.dart';
 
 abstract class GetLeaveAllocationState extends Equatable {
@@ -12,11 +14,11 @@ class GetLeaveAllocationInitial extends GetLeaveAllocationState {}
 class GetLeaveAllocationLoading extends GetLeaveAllocationState {}
 
 class GetLeaveAllocationLoaded extends GetLeaveAllocationState {
-  Allocation allocation;
+  final Allocation allocation;
   GetLeaveAllocationLoaded(this.allocation);
 }
 
 class GetLeaveAllocationError extends GetLeaveAllocationState {
-  String error;
+  final String error;
   GetLeaveAllocationError(this.error);
 }

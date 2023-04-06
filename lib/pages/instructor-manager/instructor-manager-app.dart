@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +35,8 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
 
   var instructorLength;
 
+  String _scanResult = 'No data yet';
+
   @override
   void initState() {
     _userBloc.add(GetProfileUserList());
@@ -54,7 +57,13 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
           User user = state.userModel;
 
           return GestureDetector(
-            onTap: () => _setToggleMenu(false),
+            onTap: () {
+              final _state = _endSideMenuKey.currentState!;
+              final _state2 = _sideMenuKey.currentState!;
+
+              _state.closeSideMenu();
+              _state2.closeSideMenu();
+            },
             child: SideMenu(
               key: _endSideMenuKey,
               inverse: true, // end side menu
@@ -65,11 +74,7 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
                 child: _buildSidebar(user),
               ),
               maxMenuWidth: 250,
-              onChange: (_isOpened) {
-                if (mounted) {
-                  setState(() => isOpened = _isOpened);
-                }
-              },
+              onChange: (_isOpened) {},
               child: GestureDetector(
                 onTap: () => _setToggleMenu(false),
                 child: SideMenu(
@@ -79,11 +84,7 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
                   key: _sideMenuKey,
                   menu: _buildSidebar(user),
                   type: SideMenuType.slideNRotate,
-                  onChange: (_isOpened) {
-                    if (mounted) {
-                      setState(() => isOpened = _isOpened);
-                    }
-                  },
+                  onChange: (_isOpened) {},
                   child: IgnorePointer(
                     ignoring: isOpened,
                     child: Scaffold(
@@ -99,9 +100,12 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
                           ),
                           onPressed: () => _setToggleMenu(),
                         ),
-                        actions: const [
-                          Icon(Icons.qr_code_scanner,
-                              size: 30, color: Color(0xffC9D1D9)),
+                        actions: [
+                          GestureDetector(
+                            onTap: () => _scanQR,
+                            child: Icon(Icons.qr_code_scanner,
+                                size: 30, color: Color(0xffC9D1D9)),
+                          ),
                           SizedBox(width: 20),
                         ],
                       ),
@@ -400,6 +404,15 @@ class _InstructorPageSManagertate extends State<InstructorManagerPage> {
             )
           ],
         ));
+  }
+
+  Future<void> _scanQR() async {
+    String result = await FlutterBarcodeScanner.scanBarcode(
+        "#FF0000", "Cancel", true, ScanMode.QR);
+
+    setState(() {
+      _scanResult = result;
+    });
   }
 
   _setInstructorTotal() async {

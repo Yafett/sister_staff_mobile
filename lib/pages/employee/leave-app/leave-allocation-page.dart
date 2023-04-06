@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sister_staff_mobile/bloc/leave-allocation/get_leave_allocation_bloc.dart';
 import 'package:sister_staff_mobile/models/Allocation-model.dart';
@@ -20,6 +24,16 @@ class _LeaveAllocationPageState extends State<LeaveAllocationPage> {
   final _allocationBloc = GetLeaveAllocationBloc();
 
   var allocationList = [];
+  String _scanResult = 'No data yet';
+
+  Future<void> _scanQR() async {
+    String result = await FlutterBarcodeScanner.scanBarcode(
+        "#FF0000", "Cancel", true, ScanMode.QR);
+
+    setState(() {
+      _scanResult = result;
+    });
+  }
 
   @override
   void initState() {
@@ -43,9 +57,7 @@ class _LeaveAllocationPageState extends State<LeaveAllocationPage> {
           'Leave Allocation',
           style: sWhiteTextStyle.copyWith(fontWeight: semiBold),
         ),
-        actions: [
-          
-        ],
+        actions: [],
       ),
       body: ScrollConfiguration(
         behavior: NoScrollWaves(),
@@ -53,6 +65,7 @@ class _LeaveAllocationPageState extends State<LeaveAllocationPage> {
           child: SizedBox(
               child: Column(
             children: [
+  
               _buildLeaveTotalList(),
             ],
           )),

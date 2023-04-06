@@ -1,8 +1,7 @@
-import 'package:dio/dio.dart';
+// ignore_for_file: prefer_const_constructors_in_immutables
+
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sister_staff_mobile/bloc/profile-employee/get_profile_employee_bloc.dart';
 import 'package:sister_staff_mobile/bloc/profile-instructor/get_profile_instructor_bloc.dart';
@@ -10,7 +9,6 @@ import 'package:sister_staff_mobile/bloc/profile-user/get_profile_user_bloc.dart
 import 'package:sister_staff_mobile/models/Employee-model.dart';
 import 'package:sister_staff_mobile/models/Instructor-model.dart';
 import 'package:sister_staff_mobile/models/User-model.dart';
-import 'package:sister_staff_mobile/pages/auth/splash-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -73,7 +71,6 @@ class _ProfilePageState extends State<ProfilePage> {
         leading: const BackButton(color: Color(0xffC9D1D9)),
         title: Text('My Profile',
             style: sWhiteTextStyle.copyWith(fontWeight: semiBold)),
-        actions: [],
       ),
       body: ScrollConfiguration(
         behavior: NoScrollWaves(),

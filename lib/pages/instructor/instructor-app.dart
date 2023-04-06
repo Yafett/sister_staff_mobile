@@ -1,13 +1,18 @@
 // ignore_for_file: prefer_is_empty, prefer_const_constructors
 
+import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shrink_sidemenu/shrink_sidemenu.dart';
 import 'package:sister_staff_mobile/bloc/instructor-schedule/instructor_schedule_bloc.dart';
@@ -51,6 +56,8 @@ class _InstructorPageState extends State<InstructorPage> {
   var schedulelength;
   var instructorLength;
 
+  String _scanResult = 'No data yet';
+
   @override
   void initState() {
     _employeeBloc.add(GetProfileEmployeeList());
@@ -75,26 +82,31 @@ class _InstructorPageState extends State<InstructorPage> {
           Instructor instructor = state.instructorModel;
           return GestureDetector(
             onTap: () {
-              _setToggleMenu(false);
+              final _state = _endSideMenuKey.currentState!;
+              if (_state.isOpened) {
+                print('marine');
+              } else {
+                print('the rock ');
+              }
             },
             child: SideMenu(
               key: _endSideMenuKey,
               inverse: false,
-              background: Colors.green[700],
+              background: sGreyColor,
               type: SideMenuType.slideNRotate,
               menu: Padding(
                 padding: const EdgeInsets.only(left: 25.0),
                 child: _buildSidebar(instructor),
               ),
               maxMenuWidth: 250,
-              onChange: (_isOpened) {
-                if (mounted) {
-                  setState(() => isOpened = _isOpened);
-                }
-              },
+              onChange: (_isOpened) {},
               child: GestureDetector(
                 onTap: () {
-                  _setToggleMenu(false);
+                  final _state = _endSideMenuKey.currentState!;
+                  final _state2 = _sideMenuKey.currentState!;
+
+                  _state.closeSideMenu();
+                  _state2.closeSideMenu();
                 },
                 child: SideMenu(
                   maxMenuWidth: 250,
@@ -123,9 +135,12 @@ class _InstructorPageState extends State<InstructorPage> {
                           ),
                           onPressed: () => _setToggleMenu(),
                         ),
-                        actions: const [
-                          Icon(Icons.qr_code_scanner,
-                              size: 30, color: Color(0xffC9D1D9)),
+                        actions: [
+                          GestureDetector(
+                            onTap: () => _scanQR,
+                            child: Icon(Icons.qr_code_scanner,
+                                size: 30, color: Color(0xffC9D1D9)),
+                          ),
                           SizedBox(width: 20),
                         ],
                       ),
@@ -137,6 +152,7 @@ class _InstructorPageState extends State<InstructorPage> {
                             children: [
                               _buildProfilePicture(),
                               _buildProfileTitle(instructor.data),
+
                               _buildProfileChip(),
                               _buildStudentSection(instructor.data),
                               widget.manager == true
@@ -835,6 +851,15 @@ class _InstructorPageState extends State<InstructorPage> {
             )
           ],
         ));
+  }
+
+  Future<void> _scanQR() async {
+    String result = await FlutterBarcodeScanner.scanBarcode(
+        "#FF0000", "Cancel", true, ScanMode.QR);
+
+    setState(() {
+      _scanResult = result;
+    });
   }
 
   _setStudentTotal() async {
