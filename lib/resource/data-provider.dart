@@ -20,16 +20,15 @@ class DataProvider {
 
     try {
       dio.interceptors.add(CookieManager(cookieJar));
-      final response = await dio
-          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
-        'usr': user,
-        'pwd': pass,
-      });
+      final response = await dio.post(
+          "https://${baseUrl}.sekolahmusik.co.id/api/method/login",
+          data: {
+            'usr': user,
+            'pwd': pass,
+          });
 
       final getCode = await dio.get(
           'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Application/');
-
-      print('raveling : ' + getCode.data['data'].length.toString());
 
       pref.setString('leave-length', getCode.data['data'].length.toString());
 
@@ -51,11 +50,12 @@ class DataProvider {
 
     try {
       dio.interceptors.add(CookieManager(cookieJar));
-      final response = await dio
-          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
-        'usr': user,
-        'pwd': pass,
-      });
+      final response = await dio.post(
+          "https://${baseUrl}.sekolahmusik.co.id/api/method/login",
+          data: {
+            'usr': user,
+            'pwd': pass,
+          });
 
       final getCode = await dio.get(
           'https://${baseUrl}.sekolahmusik.co.id/api/resource/Leave Allocation/');
@@ -87,15 +87,16 @@ class DataProvider {
 
     try {
       dio.interceptors.add(CookieManager(cookieJar));
-      final response = await dio
-          .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
-        'usr': user,
-        'pwd': pass,
-      });
+      final response = await dio.post(
+          'https://${baseUrl}.sekolahmusik.co.id/api/method/login',
+          data: {
+            'usr': user,
+            'pwd': pass,
+          });
 
       if (code == null) {
-        final getCode = await dio
-            .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
+        final getCode = await dio.get(
+            'https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
 
         final code = getCode.data['data'][0]['name'];
 
@@ -150,15 +151,16 @@ class DataProvider {
 
     try {
       dio.interceptors.add(CookieManager(cookieJar));
-      final response = await dio
-          .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
-        'usr': user,
-        'pwd': pass,
-      });
+      final response = await dio.post(
+          'https://${baseUrl}.sekolahmusik.co.id/api/method/login',
+          data: {
+            'usr': user,
+            'pwd': pass,
+          });
 
       if (code == null) {
-        final getCode = await dio
-            .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
+        final getCode = await dio.get(
+            'https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
 
         final code = getCode.data['data'][0]['name'];
 
@@ -172,11 +174,12 @@ class DataProvider {
             getStudentGroupCode.data['data'].length.toString());
 
         dio.interceptors.add(CookieManager(cookieJar));
-        final response = await dio
-            .post('https://${baseUrl}.sekolahmusik.co.id/api/method/login', data: {
-          'usr': 'administrator',
-          'pwd': 'admin',
-        });
+        final response = await dio.post(
+            'https://${baseUrl}.sekolahmusik.co.id/api/method/login',
+            data: {
+              'usr': 'administrator',
+              'pwd': 'admin',
+            });
 
         print('limbo : ' + response.data.toString());
 

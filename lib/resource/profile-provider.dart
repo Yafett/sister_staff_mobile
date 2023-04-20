@@ -20,11 +20,12 @@ class ProfileProvider {
 
     try {
       dio.interceptors.add(CookieManager(cookieJar));
-      final response = await dio
-          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
-        'usr': user,
-        'pwd': pass,
-      });
+      final response = await dio.post(
+          "https://${baseUrl}.sekolahmusik.co.id/api/method/login",
+          data: {
+            'usr': user,
+            'pwd': pass,
+          });
 
       var emailUser = pref.getString('user-email');
 
@@ -48,17 +49,21 @@ class ProfileProvider {
 
     try {
       dio.interceptors.add(CookieManager(cookieJar));
-      final response = await dio
-          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
-        'usr': user,
-        'pwd': pass,
-      });
+      final response = await dio.post(
+          "https://${baseUrl}.sekolahmusik.co.id/api/method/login",
+          data: {
+            'usr': user,
+            'pwd': pass,
+          });
 
       final getCode = await dio
           .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Employee/');
 
       final getEmployee = await dio.get(
           'https://${baseUrl}.sekolahmusik.co.id/api/resource/Employee/${getCode.data['data'][0]['name']}');
+
+      pref.setString(
+          'employee-email', getEmployee.data['data']['user_id'].toString());
 
       return Employee.fromJson(getEmployee.data);
     } catch (error, stacktrace) {
@@ -79,14 +84,15 @@ class ProfileProvider {
 
     try {
       dio.interceptors.add(CookieManager(cookieJar));
-      final response = await dio
-          .post("https://${baseUrl}.sekolahmusik.co.id/api/method/login", data: {
-        'usr': user,
-        'pwd': pass,
-      });
+      final response = await dio.post(
+          "https://${baseUrl}.sekolahmusik.co.id/api/method/login",
+          data: {
+            'usr': user,
+            'pwd': pass,
+          });
 
-      final getCode = await dio
-          .get('https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
+      final getCode = await dio.get(
+          'https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/');
 
       final getInstructor = await dio.get(
           'https://${baseUrl}.sekolahmusik.co.id/api/resource/Instructor/${getCode.data['data'][0]['name']}');

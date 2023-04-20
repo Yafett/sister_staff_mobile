@@ -70,13 +70,13 @@ class _LoginPageState extends State<LoginPage> {
                   style: sBlackTextStyle.copyWith(
                       fontSize: 20, fontWeight: light)),
               TextSpan(
-                  text: 'Login',
+                  text: 'Login ',
                   style: sBlackTextStyle.copyWith(
                       fontSize: 30, fontWeight: semiBold)),
               TextSpan(
                   text: 'for Staff!!!',
-                  style:
-                      sRedTextStyle.copyWith(fontSize: 12, fontWeight: light))
+                  style: sRedTextStyle.copyWith(
+                      fontSize: 12, fontWeight: semiBold))
             ],
           ),
         ),
@@ -166,6 +166,7 @@ class _LoginPageState extends State<LoginPage> {
         } else if (state is LoginError) {
           MotionToast(
             height: 50,
+            animationDuration: Duration(seconds: 5),
             width: 300,
             primaryColor: sRedColor,
             description: Text(
@@ -178,29 +179,52 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       builder: (context, state) {
-        return Material(
-          color: sRedColor,
-          child: InkWell(
-            splashColor: Colors.grey,
-            onTap: () async {
-              _loginBloc.add(
-                  Login(_usernameController.text, _passwordController.text));
-            },
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: 50,
-              child: Center(
-                  child: Text(
-                'Login',
-                style: sWhiteTextStyle.copyWith(
-                  fontWeight: semiBold,
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
-              )),
+        if (state is LoginLoading) {
+          return Material(
+            color: sRedColor,
+            child: InkWell(
+              splashColor: Colors.grey,
+              onTap: () async {},
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+                child: Center(
+                    child: Container(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: sWhiteColor,
+                  ),
+                )),
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          return Material(
+            color: sRedColor,
+            child: InkWell(
+              splashColor: Colors.grey,
+              onTap: () async {
+                _loginBloc.add(
+                    Login(_usernameController.text, _passwordController.text));
+              },
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+                child: Center(
+                    child: Text(
+                  'Login',
+                  style: sWhiteTextStyle.copyWith(
+                    fontWeight: semiBold,
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                )),
+              ),
+            ),
+          );
+        }
       },
     );
   }

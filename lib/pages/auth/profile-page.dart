@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors_in_immutables, sized_box_for_whitespace, prefer_if_null_operators
 
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -558,7 +558,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _setInstructorData(instructor) {
-    print(instructor.name);
     _instructorEmailController.text =
         instructor.instructorEmail.toString() == 'null'
             ? ''

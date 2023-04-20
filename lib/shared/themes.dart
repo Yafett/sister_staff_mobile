@@ -31,7 +31,8 @@ TextStyle sBlackTextStyle =
     GoogleFonts.openSans(color: const Color(0xff0D1117));
 TextStyle sGreyTextStyle = GoogleFonts.openSans(color: const Color(0xff6B7178));
 TextStyle sRedTextStyle = GoogleFonts.openSans(color: const Color(0xffD15151));
-TextStyle sGreenTextStyle = GoogleFonts.openSans(color: const Color(0xff347D39));
+TextStyle sGreenTextStyle =
+    GoogleFonts.openSans(color: const Color(0xff347D39));
 
 BorderRadius radiusNormal = BorderRadius.circular(12);
 
@@ -43,7 +44,7 @@ FontWeight semi = FontWeight.w500;
 FontWeight semiBold = FontWeight.bold;
 
 // ! URL
-String baseUrl = 'njajal';
+String baseUrl = 'sister';
 
 class NoScrollWaves extends ScrollBehavior {
   @override

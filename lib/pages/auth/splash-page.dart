@@ -27,25 +27,26 @@ class _SplashPageState extends State<SplashPage> {
 
   Widget _buildSplashPage(context) {
     return Scaffold(
-        body: AnimatedSplashScreen(
-      splashIconSize: 1000,
-      duration: 2000,
-      splash: _buildSecondSplashBackground(),
-      nextScreen: const LoginPage(),
-      splashTransition: SplashTransition.fadeTransition,
+        body: Container(
+      padding: EdgeInsets.all(20),
+      child: AnimatedSplashScreen(
+        splashIconSize: 1000,
+        duration: 2000,
+        splash: _buildSecondSplashBackground(),
+        nextScreen: const LoginPage(),
+        splashTransition: SplashTransition.fadeTransition,
+      ),
     ));
   }
 
   Widget _buildSecondSplashBackground() {
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.all(20),
-        height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-              fit: BoxFit.cover,
-              image: const AssetImage('assets/images/welcome.png')),
+              // fit: BoxFit.,
+              image: AssetImage('assets/images/logo-text.png')),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -54,7 +55,7 @@ class _SplashPageState extends State<SplashPage> {
             Container(
                 margin: EdgeInsets.only(bottom: 30),
                 child: Text(
-                  'Version 1.0.0',
+                  'Version 1.0',
                   style: sGreyTextStyle.copyWith(
                       fontWeight: FontWeight.bold, fontSize: 20),
                 )),
@@ -76,7 +77,7 @@ class _SplashPageState extends State<SplashPage> {
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.2), BlendMode.dstATop),
-              image: const AssetImage('assets/images/welcome.png')),
+              image: const AssetImage('assets/images/logo-text.png')),
         ),
         child: _buildSplashText(),
       ),

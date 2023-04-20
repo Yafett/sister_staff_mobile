@@ -465,7 +465,7 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
   }
 
   _filterAttendance(String filter) {
-    // isLoading = true;
+    // isLoading = true; 
 
     if (mounted) {
       setState(() {

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, sized_box_for_whitespace, unnecessary_string_interpolations
+
 import 'dart:developer';
 
 import 'package:cookie_jar/cookie_jar.dart';
@@ -8,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sister_staff_mobile/models/Schedule-model.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 
 class InstructorManagerDetailPage extends StatefulWidget {
@@ -226,8 +227,7 @@ class _InstructorManagerDetailPageState
                           decoration: const BoxDecoration(
                               color: Colors.red,
                               image: DecorationImage(
-                                image: AssetImage(
-                                    'assets/images/default.jpg'),
+                                image: AssetImage('assets/images/default.jpg'),
                                 fit: BoxFit.fitHeight,
                               ),
                               borderRadius:

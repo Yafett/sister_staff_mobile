@@ -43,6 +43,7 @@ dependencies:
     sdk: flutter
   flutter_barcode_scanner: ^2.0.0
   flutter_bloc: ^8.1.1
+  flutter_launcher_icons: ^0.13.0
   flutter_rating_bar: ^4.0.1
   geocoding: ^2.0.5
   google_fonts: ^4.0.3
@@ -60,6 +61,11 @@ dependencies:
   syncfusion_flutter_core: ^20.3.59
   syncfusion_flutter_datepicker: ^20.3.59
   top_modal_sheet: ^2.0.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/smi-logo.png"
 
 dev_dependencies:
   flutter_lints: ^2.0.0

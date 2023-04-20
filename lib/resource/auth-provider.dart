@@ -9,8 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:sister_staff_mobile/shared/themes.dart';
 
-class AuthProvider { 
-
+class AuthProvider {
   login(username, password) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Dio dio = Dio();
@@ -18,11 +17,11 @@ class AuthProvider {
 
     var listUser = [];
 
-    // var user = username;
-    // final pass = password;
+    var user = username;
+    final pass = password;
 
-    var user = 'dana';
-    final pass = 'admin';
+    // var user = 'nuki';
+    // final pass = 'admin';
 
     final verify = await http.post(
         Uri.parse('https://${baseUrl}.sekolahmusik.co.id/api/method/login'),

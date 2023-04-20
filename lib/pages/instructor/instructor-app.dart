@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_is_empty, prefer_const_constructors
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:motion_toast/motion_toast.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shrink_sidemenu/shrink_sidemenu.dart';
@@ -30,6 +32,8 @@ import 'package:sister_staff_mobile/pages/instructor/student-group/student-group
 import 'package:sister_staff_mobile/pages/instructor/student/student-list-page.dart';
 import 'package:sister_staff_mobile/shared/themes.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
+import 'package:http/http.dart' as http;
+import 'package:top_modal_sheet/top_modal_sheet.dart';
 
 class InstructorPage extends StatefulWidget {
   bool? manager;
@@ -56,7 +60,13 @@ class _InstructorPageState extends State<InstructorPage> {
   var schedulelength;
   var instructorLength;
 
+  String? _topModalData;
+
   String _scanResult = 'No data yet';
+
+  String responseData = 'No response';
+
+  var listMethod = ['In', 'Out'];
 
   @override
   void initState() {
@@ -128,16 +138,26 @@ class _InstructorPageState extends State<InstructorPage> {
                         elevation: 0,
                         backgroundColor: const Color(0xff0D1117),
                         centerTitle: true,
-                        leading: IconButton(
-                          icon: const Icon(
-                            Icons.menu,
-                            size: 30,
+                        leading: Container(
+                          margin: EdgeInsets.only(left: 8),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.menu,
+                              size: 35,
+                            ),
+                            onPressed: () => _setToggleMenu(),
                           ),
-                          onPressed: () => _setToggleMenu(),
                         ),
                         actions: [
                           GestureDetector(
-                            onTap: () => _scanQR,
+                            onTap: () async {
+                              var value = await showTopModalSheet<String?>(
+                                  context, QrModal());
+
+                              setState(() {
+                                _topModalData = value;
+                              });
+                            },
                             child: Icon(Icons.qr_code_scanner,
                                 size: 30, color: Color(0xffC9D1D9)),
                           ),
@@ -853,13 +873,55 @@ class _InstructorPageState extends State<InstructorPage> {
         ));
   }
 
-  Future<void> _scanQR() async {
+  Future<void> _scanQR(type) async {
+    Navigator.pop(context);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     String result = await FlutterBarcodeScanner.scanBarcode(
         "#FF0000", "Cancel", true, ScanMode.QR);
+
+    var userId = prefs.getString('employee-email');
 
     setState(() {
       _scanResult = result;
     });
+
+    var response = await http.post(
+        Uri.parse(
+            'https://njajal.sekolahmusik.co.id/api/method/smi.api.post_employee_attendance'),
+        body: {"name": userId, "qr": _scanResult, "checkType": type});
+
+    var data = jsonDecode(response.body);
+
+    setState(() => responseData = response.body.toString());
+
+    if (response.statusCode != 200) {
+      MotionToast(
+        toastDuration: Duration(seconds: 5),
+        height: 50,
+        width: 300,
+        primaryColor: sRedColor,
+        description: Text(
+          data['exception'].toString(),
+          style: sRedTextStyle.copyWith(fontWeight: semiBold),
+        ),
+        icon: Icons.warning_amber,
+        animationCurve: Curves.bounceIn,
+      ).show(context);
+    } else {
+      MotionToast(
+        toastDuration: Duration(seconds: 5),
+        height: 50,
+        width: 300,
+        primaryColor: sGreenColor,
+        description: Text(
+          'QR Scan Successful',
+          style: sGreenTextStyle.copyWith(fontWeight: semiBold),
+        ),
+        icon: Icons.warning_amber,
+        animationCurve: Curves.bounceIn,
+      ).show(context);
+    }
   }
 
   _setStudentTotal() async {
@@ -996,5 +1058,68 @@ class _InstructorPageState extends State<InstructorPage> {
     var formattedDate = DateFormat("EEE, d MMMM").format(DateTime.now());
 
     return formattedDate.toString();
+  }
+
+  QrModal() {
+    return Container(
+      color: sBlackColor,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const SizedBox(height: 30),
+
+          // ! Unit Field
+          Text('Scan Type', style: fTextColorStyle),
+          SingleChildScrollView(
+            child: Container(
+              margin: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+              decoration: BoxDecoration(
+                color: sGreyColor,
+                border: Border.all(color: sBlackColor),
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+              ),
+              width: MediaQuery.of(context).size.width,
+              child: DropdownButton(
+                dropdownColor: sGreyColor,
+                style: sWhiteTextStyle,
+                underline: const SizedBox(),
+                isExpanded: true,
+                hint: Text('e.x type', style: fGreyTextStyle),
+                items: listMethod.map((item) {
+                  return DropdownMenuItem(
+                    value: item.toString(),
+                    child: Text('Check ${item.toString()}'),
+                  );
+                }).toList(),
+                onChanged: (newVal) {
+                  _scanQR(newVal.toString().toUpperCase());
+                  print(newVal.toString());
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                  color: sGreyColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: sBlackColor)),
+              child: Center(
+                  child: Text(
+                'Cancel',
+                style: sWhiteTextStyle,
+              )),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
