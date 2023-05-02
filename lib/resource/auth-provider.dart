@@ -11,6 +11,8 @@ import 'package:sister_staff_mobile/shared/themes.dart';
 
 class AuthProvider {
   login(username, password) async {
+    //
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Dio dio = Dio();
     var cookieJar = CookieJar();
@@ -19,9 +21,6 @@ class AuthProvider {
 
     var user = username;
     final pass = password;
-
-    // var user = 'nuki';
-    // final pass = 'admin';
 
     final verify = await http.post(
         Uri.parse('https://${baseUrl}.sekolahmusik.co.id/api/method/login'),

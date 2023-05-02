@@ -101,7 +101,7 @@ class _InstructorManagerDetailPageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 250,
+                width: 200,
                 child: Text(widget.instructorName,
                     style: sWhiteTextStyle.copyWith(
                         overflow: TextOverflow.ellipsis,

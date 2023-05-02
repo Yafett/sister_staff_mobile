@@ -44,7 +44,7 @@ FontWeight semi = FontWeight.w500;
 FontWeight semiBold = FontWeight.bold;
 
 // ! URL
-String baseUrl = 'sister';
+String baseUrl = 'njajal';
 
 class NoScrollWaves extends ScrollBehavior {
   @override
